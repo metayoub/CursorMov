@@ -87,3 +87,10 @@ import Testing
     c.turnOn()
     #expect(h.accessibility.promptCount == 0)
 }
+
+/// Ticks must be frequent enough that an idle user is nudged roughly once a
+/// minute, not every other tick when tick and threshold line up.
+@Test @MainActor func idleUserIsNudgedWithinSeventyFiveSeconds() {
+    let worstCase = KeepAwakeController.nudgeIdleThreshold + KeepAwakeController.tickInterval
+    #expect(worstCase <= 75)
+}

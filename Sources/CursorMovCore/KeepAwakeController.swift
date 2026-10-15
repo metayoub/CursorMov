@@ -2,7 +2,7 @@ import Foundation
 
 /// The app's core: switches keep-awake on and off and reports its status.
 @MainActor public final class KeepAwakeController {
-    public static let tickInterval: TimeInterval = 60
+    public static let tickInterval: TimeInterval = 15
     public static let nudgeIdleThreshold: TimeInterval = 60
 
     public private(set) var isOn = false

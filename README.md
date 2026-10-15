@@ -110,9 +110,11 @@ it, and only the nudge is skipped.
   (`PreventUserIdleDisplaySleep`). That stops the display and the system from idle
   sleeping, which also stops the idle screen lock. You can see it with
   `pmset -g assertions`.
-- **Nudge.** Every 60 seconds it checks how long you've been idle. If it's been at least
+- **Nudge.** Every 15 seconds it checks how long you've been idle. If it's been at least
   60 seconds, it posts a real mouse-moved event one pixel over and another one back.
-  That resets macOS's idle timer just like a hand on the mouse would.
+  That resets macOS's idle timer just like a hand on the mouse would. If the pointer
+  is parked in a screen corner, the nudge is skipped so it can't trigger a Hot Corner
+  (such as Lock Screen); keep-awake still works there.
 
 ## Limitations
 
