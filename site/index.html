@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CursorMov</title>
+<meta name="description" content="A tiny macOS menu bar app that keeps your Mac awake, so your VPN and long-running jobs survive while you're away.">
+<link rel="icon" href="images/icon.svg" type="image/svg+xml">
+<style>
+  :root {
+    --bg: #fbf7f2;
+    --surface: #ffffff;
+    --text: #2a1d14;
+    --muted: #6f6258;
+    --accent: #b5652a;
+    --accent-soft: #f4e3d0;
+    --border: #eadfd3;
+    --code-bg: #2a1d14;
+    --code-text: #f8ede0;
+    --radius: 16px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #17120e;
+      --surface: #211a15;
+      --text: #f3e9df;
+      --muted: #b2a497;
+      --accent: #e39a5c;
+      --accent-soft: #3a2a1e;
+      --border: #3a2f27;
+      --code-bg: #0f0b08;
+      --code-text: #f3e9df;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #17120e;
+    --surface: #211a15;
+    --text: #f3e9df;
+    --muted: #b2a497;
+    --accent: #e39a5c;
+    --accent-soft: #3a2a1e;
+    --border: #3a2f27;
+    --code-bg: #0f0b08;
+    --code-text: #f3e9df;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 17px/1.6 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 0 16px; }
+  a { color: var(--accent); }
+  img { max-width: 100%; height: auto; }
+
+  header.hero { text-align: center; padding: 72px 0 40px; }
+  .hero .logo { width: 104px; height: 104px; filter: drop-shadow(0 10px 24px rgba(120, 60, 20, .25)); }
+  .hero h1 { font-size: clamp(40px, 8vw, 64px); line-height: 1.05; margin: 20px 0 12px; letter-spacing: -0.02em; }
+  .hero p.lede { font-size: clamp(18px, 3vw, 22px); color: var(--muted); max-width: 620px; margin: 0 auto 28px; }
+  .buttons { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .btn {
+    display: inline-block; padding: 12px 22px; border-radius: 999px; font-weight: 600;
+    text-decoration: none; border: 1px solid var(--accent);
+  }
+  .btn.primary { background: var(--accent); color: #fff; }
+  .btn.ghost { color: var(--accent); background: transparent; }
+
+  .bars { display: grid; gap: 14px; margin: 44px auto 0; max-width: 560px; }
+  .bars figure { margin: 0; }
+  .bars figcaption { font-size: 14px; color: var(--muted); margin-top: 4px; }
+
+  section { padding: 56px 0; border-top: 1px solid var(--border); }
+  section h2 { font-size: clamp(26px, 4.5vw, 34px); margin: 0 0 16px; letter-spacing: -0.01em; }
+  section p.intro { color: var(--muted); max-width: 640px; margin-top: 0; }
+
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-top: 24px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 22px; }
+  .card h3 { margin: 0 0 6px; font-size: 18px; }
+  .card p { margin: 0; color: var(--muted); font-size: 16px; }
+
+  .usage { display: grid; grid-template-columns: 1fr auto; gap: 32px; align-items: center; }
+  .usage dl { margin: 0; }
+  .usage dt { font-weight: 700; margin-top: 14px; }
+  .usage dt:first-child { margin-top: 0; }
+  .usage dd { margin: 2px 0 0; color: var(--muted); }
+  @media (max-width: 720px) { .usage { grid-template-columns: 1fr; } .usage img { justify-self: center; } }
+
+  ol.steps { list-style: none; counter-reset: step; padding: 0; margin: 28px 0 0; }
+  ol.steps > li {
+    counter-increment: step; position: relative; padding: 0 0 28px 58px;
+  }
+  ol.steps > li::before {
+    content: counter(step); position: absolute; left: 0; top: 0;
+    width: 38px; height: 38px; border-radius: 50%;
+    background: var(--accent-soft); color: var(--accent); font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+  }
+  ol.steps > li:not(:last-child)::after {
+    content: ""; position: absolute; left: 18px; top: 44px; bottom: 6px; width: 2px; background: var(--border);
+  }
+  ol.steps h3 { margin: 4px 0 6px; font-size: 19px; }
+  ol.steps p { margin: 0 0 10px; color: var(--muted); }
+  pre {
+    background: var(--code-bg); color: var(--code-text); border-radius: 12px;
+    padding: 14px 16px; overflow-x: auto; font-size: 14.5px; line-height: 1.5; margin: 8px 0 0;
+  }
+  code { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+  p code, li code, dd code { background: var(--accent-soft); padding: 1px 6px; border-radius: 6px; font-size: .9em; }
+  .note {
+    background: var(--accent-soft); border-radius: 12px; padding: 12px 16px; margin-top: 10px; font-size: 15.5px;
+  }
+
+  ul.limits { padding-left: 20px; }
+  ul.limits li { margin-bottom: 8px; }
+
+  footer { border-top: 1px solid var(--border); padding: 32px 0 48px; color: var(--muted); font-size: 15px; text-align: center; }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <img class="logo" src="images/icon.svg" alt="CursorMov icon: a steaming coffee cup">
+    <h1>CursorMov</h1>
+    <p class="lede">One click keeps your Mac awake, so your VPN and long-running jobs survive while you're away.</p>
+    <div class="buttons">
+      <a class="btn primary" href="#get-started">Get started</a>
+      <a class="btn ghost" href="https://github.com/your-username/cursormov">View on GitHub</a>
+    </div>
+    <div class="bars">
+      <figure>
+        <img src="images/menubar-off.svg" width="560" height="48" alt="Menu bar with an empty coffee cup: CursorMov is off">
+        <figcaption>Off: an empty cup</figcaption>
+      </figure>
+      <figure>
+        <img src="images/menubar-on.svg" width="560" height="48" alt="Menu bar with a full, steaming coffee cup: CursorMov is on">
+        <figcaption>On: a full, steaming cup</figcaption>
+      </figure>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section>
+    <div class="wrap">
+      <h2>Walk away. Come back to the same session.</h2>
+      <p class="intro">You start a build, a migration, or a big download, and go grab a coffee. Twenty minutes later the Mac has locked itself, the VPN has dropped, and the job is gone. CursorMov stops that from happening.</p>
+      <div class="cards">
+        <div class="card"><h3>One click</h3><p>Left-click the cup to turn it on, click again to turn it off.</p></div>
+        <div class="card"><h3>No sleep, no lock</h3><p>While it's on, your Mac won't idle sleep, dim the screen, or lock itself.</p></div>
+        <div class="card"><h3>Mouse nudge</h3><p>When you're away, it moves the pointer one pixel and back once a minute. Invisible, but macOS sees you as present.</p></div>
+        <div class="card"><h3>Never in your way</h3><p>The nudge only runs while you're idle. No Dock icon, no window, no notifications.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="get-started">
+    <div class="wrap">
+      <h2>Get started</h2>
+      <p class="intro">You build CursorMov from source. It takes about a minute.</p>
+      <ol class="steps">
+        <li>
+          <h3>Check the requirements</h3>
+          <p>macOS 26 or later, and Xcode 26 (or its command line tools with Swift 6.2). To check, run:</p>
+          <pre><code>swift --version</code></pre>
+        </li>
+        <li>
+          <h3>Get the code</h3>
+          <pre><code>git clone https://github.com/your-username/cursormov.git
+cd cursormov</code></pre>
+        </li>
+        <li>
+          <h3>Build the app</h3>
+          <pre><code>scripts/build-app.sh</code></pre>
+          <p>This creates <code>build/CursorMov.app</code>.</p>
+        </li>
+        <li>
+          <h3>Move it to Applications and open it</h3>
+          <pre><code>mv build/CursorMov.app /Applications/
+open /Applications/CursorMov.app</code></pre>
+          <p>An empty coffee cup appears in your menu bar.</p>
+          <div class="note"><strong>Blocked on first launch?</strong> The app is signed locally, not by a registered Apple developer. Open <strong>System Settings → Privacy &amp; Security</strong> and click <strong>Open Anyway</strong>.</div>
+        </li>
+        <li>
+          <h3>Allow the mouse nudge</h3>
+          <p>The first time you turn CursorMov on, macOS asks whether it may control the pointer. Click <strong>Open System Settings</strong>, then switch <strong>CursorMov</strong> on under <strong>Privacy &amp; Security → Accessibility</strong>.</p>
+          <div class="note">Rather not? Keeping the Mac awake still works without it. Only the nudge is skipped.</div>
+        </li>
+        <li>
+          <h3>Click the cup</h3>
+          <p>The cup fills up and starts steaming. Your Mac stays awake until you click it again.</p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap usage">
+      <div>
+        <h2>Using it</h2>
+        <dl>
+          <dt>Left-click the cup</dt>
+          <dd>Turns keep-awake on or off.</dd>
+          <dt>Right-click (or Control-click) the cup</dt>
+          <dd>Opens the menu with the status and settings.</dd>
+          <dt>Nudge mouse</dt>
+          <dd>Turns the mouse nudge on or off. Your choice is remembered.</dd>
+          <dt>Start when I log in</dt>
+          <dd>Adds CursorMov to your login items.</dd>
+          <dt>Quit</dt>
+          <dd>Stops CursorMov and lets your Mac sleep normally again.</dd>
+        </dl>
+      </div>
+      <img src="images/menu.svg" width="320" height="196" alt="CursorMov menu: Keeping Mac awake 1h 12m, Nudge mouse checked, Start when I log in, Quit">
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <h2>Good to know</h2>
+      <ul class="limits">
+        <li><strong>Keep the lid open.</strong> macOS always sleeps a MacBook when the lid closes, and no regular app can prevent that.</li>
+        <li><strong>VPN-side timeouts.</strong> If your VPN server disconnects sessions with no traffic, keeping the Mac awake won't help with that.</li>
+        <li><strong>Rebuilt the app?</strong> macOS may treat it as new. If the nudge stops working, remove CursorMov from the Accessibility list and add it again.</li>
+        <li><strong>See it working:</strong> while it's on, <code>pmset -g assertions</code> lists “CursorMov is keeping the Mac awake”.</li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">CursorMov · a tiny menu bar app for macOS · <a href="https://github.com/your-username/cursormov">Source on GitHub</a></div>
+</footer>
+
+</body>
+</html>

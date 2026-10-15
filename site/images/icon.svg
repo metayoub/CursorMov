@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" role="img" aria-label="CursorMov icon">
+  <defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f6d7a7"/><stop offset="1" stop-color="#c8844a"/></linearGradient></defs>
+  <rect x="4" y="4" width="120" height="120" rx="28" fill="url(#bg)"/>
+  <g transform="translate(22 18) scale(3.6)" fill="none" stroke="#3b2416" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h12v5a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5z" fill="#3b2416"/><path d="M16 9.5h1.5a2.5 2.5 0 0 1 0 5H16"/><path d="M2 20.5h18"/><path d="M8 2.5c-1.2 1.2 1.2 2.2 0 3.6M12 2.5c-1.2 1.2 1.2 2.2 0 3.6"/></g>
+</svg>

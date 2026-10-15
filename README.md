@@ -9,6 +9,10 @@
 </p>
 
 <p align="center">
+  <a href="https://your-username.github.io/cursormov/"><b>Website</b></a>
+</p>
+
+<p align="center">
   <img alt="macOS 26+" src="https://img.shields.io/badge/macOS-26%2B-000?logo=apple&logoColor=white">
   <img alt="Swift 6.2" src="https://img.shields.io/badge/Swift-6.2-F05138?logo=swift&logoColor=white">
   <img alt="No dependencies" src="https://img.shields.io/badge/dependencies-none-2ea44f">
