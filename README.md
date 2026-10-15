@@ -37,6 +37,11 @@ minutes later the Mac has locked itself, the VPN has dropped, and the job is gon
 CursorMov is a tiny menu bar app that stops that from happening. Click the cup,
 walk away, and your session is still there when you get back.
 
+**How it's different:** sleep blockers like Amphetamine, Caffeine and KeepingYouAwake
+keep the Mac from sleeping. CursorMov does that too, and adds an idle-aware mouse nudge
+that also keeps you looking active to apps that watch for user activity, and it never
+touches your pointer while you're working.
+
 ## Features
 
 - **One click on, one click off.** Left-click the cup in the menu bar.
@@ -164,3 +169,7 @@ scripts/                 build-app.sh, build-dmg.sh, make-icon.swift
 ## License
 
 [MIT](LICENSE) © 2026 Ayoub Metwalli
+
+---
+
+<p align="center">If CursorMov saves your session, a ⭐ helps others find it.</p>
