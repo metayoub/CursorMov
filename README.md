@@ -144,6 +144,8 @@ it, and only the nudge is skipped.
 swift test               # run the test suite
 swift build              # debug build
 scripts/build-app.sh     # build the .app bundle (Apple silicon + Intel)
+CODESIGN_IDENTITY="Apple Development: you@example.com (TEAMID)" scripts/build-app.sh
+                         # sign local builds so Accessibility permission survives rebuilds
 scripts/build-dmg.sh     # build the release DMG into build/
 swift scripts/make-icon.swift   # regenerate AppIcon.icns from AppIcon.svg
 ```

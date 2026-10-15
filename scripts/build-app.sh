@@ -12,6 +12,8 @@ mkdir -p "$app/Contents/MacOS" "$app/Contents/Resources"
 cp "$(swift build -c release "${arch_flags[@]}" --show-bin-path)/CursorMov" "$app/Contents/MacOS/CursorMov"
 cp Resources/Info.plist "$app/Contents/Info.plist"
 cp Resources/AppIcon.icns "$app/Contents/Resources/AppIcon.icns"
-codesign --force --sign - "$app"
+# Ad-hoc by default. For local testing, set CODESIGN_IDENTITY to a certificate
+# so macOS keeps the Accessibility permission across rebuilds.
+codesign --force --sign "${CODESIGN_IDENTITY:--}" "$app"
 
 echo "Built $(pwd)/$app"
