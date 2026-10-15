@@ -12,7 +12,10 @@ import Foundation
 
     public var nudgeEnabled: Bool {
         get { settings.nudgeEnabled }
-        set { settings.nudgeEnabled = newValue }
+        set {
+            settings.nudgeEnabled = newValue
+            if isOn { requestAccessIfNeeded() }
+        }
     }
 
     private let assertion: KeepAwakeAssertion
@@ -21,6 +24,7 @@ import Foundation
     private let accessibility: AccessibilityAuthority
     private let settings: SettingsStore
     private let now: () -> Date
+    private var hasPromptedForAccess = false
 
     public init(assertion: KeepAwakeAssertion, idle: IdleTimeSource, nudger: MouseNudger,
                 accessibility: AccessibilityAuthority, settings: SettingsStore,
@@ -41,6 +45,7 @@ import Foundation
         guard !isOn, assertion.acquire() else { return }
         isOn = true
         onSince = now()
+        requestAccessIfNeeded()
         onStateChange?(true)
     }
 
@@ -53,7 +58,18 @@ import Foundation
     }
 
     /// Called every `tickInterval` seconds.
-    public func tick() {}
+    public func tick() {
+        guard isOn, nudgeEnabled, accessibility.isTrusted,
+              idle.secondsSinceLastUserInput() >= Self.nudgeIdleThreshold else { return }
+        nudger.nudge()
+    }
+
+    /// The nudge needs Accessibility; ask once per run, and only when it would be used.
+    private func requestAccessIfNeeded() {
+        guard nudgeEnabled, !accessibility.isTrusted, !hasPromptedForAccess else { return }
+        hasPromptedForAccess = true
+        accessibility.promptForAccess()
+    }
 
     public func statusText() -> String {
         guard isOn, let onSince else { return "Off" }
