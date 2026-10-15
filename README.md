@@ -21,6 +21,11 @@
 </p>
 
 <p align="center">
+  <img src="docs/images/demo.gif" width="255" alt="Clicking the CursorMov cup: it fills up and starts steaming"><br>
+  <sub>One click: the cup fills up, and your Mac stays awake</sub>
+</p>
+
+<p align="center">
   <img src="docs/images/menubar-off.svg" width="560" alt="Menu bar with CursorMov off: an empty coffee cup"><br>
   <sub>Off: an empty cup</sub><br><br>
   <img src="docs/images/menubar-on.svg" width="560" alt="Menu bar with CursorMov on: a full, steaming coffee cup"><br>
