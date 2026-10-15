@@ -76,7 +76,7 @@ touches your pointer while you're working.
 - **Nudge mouse** turns the mouse nudge on or off.
 - **Turn off below battery** switches CursorMov off when your Mac is on battery and drops
   to the chosen level: Never, 10%, 20% (default) or 30%. The menu then shows
-  `Off · battery below 20%`. If you turn it on when the battery is already low, it
+  `Off · battery dropped to 20%`. If you turn it on when the battery is already low, it
   respects your choice and stays on.
 - **Start when I log in** adds CursorMov to your login items.
 - **Quit** stops CursorMov and lets your Mac sleep normally again. While the menu is

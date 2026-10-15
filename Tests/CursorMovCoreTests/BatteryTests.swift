@@ -13,7 +13,7 @@ import Testing
     c.tick()
     #expect(c.isOn == false)
     #expect(h.assertion.releaseCount == 1)
-    #expect(c.statusText() == "Off · battery below 20%")
+    #expect(c.statusText() == "Off · battery dropped to 20%")
 }
 
 @MainActor @Test func unpluggingWhileLowTurnsOff() {
@@ -99,4 +99,15 @@ import Testing
     let h = Harness()
     let c = h.makeController()
     #expect(c.needsAccessibility == false)
+}
+
+/// Raising the threshold above the current level is a setting change, not a drop.
+@MainActor @Test func raisingThresholdMidSessionStaysOn() {
+    let h = Harness()
+    h.battery.current = BatteryStatus(isOnBattery: true, percent: 25)
+    let c = h.makeController()
+    c.turnOn()
+    c.batteryThreshold = 30
+    c.tick()
+    #expect(c.isOn)
 }

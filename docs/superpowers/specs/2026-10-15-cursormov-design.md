@@ -137,7 +137,7 @@ repo is pushed and Pages is enabled with source "GitHub Actions".
 - **Battery safety:** `Turn off below battery` submenu: Never, 10%, 20%
   (default), 30%. Turns off when, on battery, the level drops to the
   threshold during a session (already-low at turn-on is respected). Status
-  then reads `Off · battery below 20%`. No notification.
+  then reads `Off · battery dropped to 20%`. No notification.
 - Tooltip is a static `CursorMov — On/Off`; `Start when I log in` opens Login
   Items settings when macOS requires approval.
 

@@ -11,6 +11,7 @@ public struct SystemBattery: BatterySource {
         for source in sources {
             guard let description = IOPSGetPowerSourceDescription(info, source)?.takeUnretainedValue() as? [String: Any],
                   description[kIOPSTypeKey] as? String == kIOPSInternalBatteryType,
+                  description[kIOPSIsPresentKey] as? Bool ?? true,
                   let current = description[kIOPSCurrentCapacityKey] as? Int,
                   let max = description[kIOPSMaxCapacityKey] as? Int, max > 0 else { continue }
             let onBattery = description[kIOPSPowerSourceStateKey] as? String == kIOPSBatteryPowerValue

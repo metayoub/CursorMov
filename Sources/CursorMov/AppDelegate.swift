@@ -14,10 +14,13 @@ import CursorMovCore
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         statusItemController = StatusItemController(controller: controller, loginItem: LoginItem())
-        timer = Timer.scheduledTimer(withTimeInterval: KeepAwakeController.tickInterval, repeats: true) {
+        let timer = Timer(timeInterval: KeepAwakeController.tickInterval, repeats: true) {
             [controller] _ in
             MainActor.assumeIsolated { controller.tick() }
         }
+        // .common keeps ticking while the menu is open.
+        RunLoop.main.add(timer, forMode: .common)
+        self.timer = timer
     }
 
     func applicationWillTerminate(_ notification: Notification) {

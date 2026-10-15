@@ -73,3 +73,12 @@ import Testing
     c.toggle()
     #expect(c.endsAt == nil)
 }
+
+/// Between the end time and the next tick, don't claim "0m left".
+@MainActor @Test func statusSaysEndingOncePastEnd() {
+    let h = Harness()
+    let c = h.makeController()
+    c.turnOn(for: 3600)
+    h.clock.now += 3605
+    #expect(c.statusText() == "Keeping Mac awake · ending")
+}

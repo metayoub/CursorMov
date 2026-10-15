@@ -28,7 +28,11 @@ import Foundation
     /// Turn off when on battery at or below this percentage; 0 means never.
     public var batteryThreshold: Int {
         get { settings.batteryThreshold }
-        set { settings.batteryThreshold = newValue }
+        set {
+            settings.batteryThreshold = newValue
+            // A new setting isn't a drop: only switch off if it falls further.
+            if isOn { wasBatteryLow = isBatteryLow() }
+        }
     }
 
     /// The nudge is wanted but macOS hasn't granted Accessibility.
@@ -51,7 +55,7 @@ import Foundation
     public init(assertion: KeepAwakeAssertion, idle: IdleTimeSource, nudger: MouseNudger,
                 accessibility: AccessibilityAuthority, settings: SettingsStore,
                 battery: BatterySource, now: @escaping () -> Date = Date.init,
-                timeZone: TimeZone = .current) {
+                timeZone: TimeZone = .autoupdatingCurrent) {
         self.assertion = assertion
         self.idle = idle
         self.nudger = nudger
@@ -60,6 +64,7 @@ import Foundation
         self.battery = battery
         self.now = now
         clockFormatter = DateFormatter()
+        clockFormatter.locale = Locale(identifier: "en_US_POSIX")
         clockFormatter.dateFormat = "HH:mm"
         clockFormatter.timeZone = timeZone
     }
@@ -120,7 +125,7 @@ import Foundation
     public func statusText() -> String {
         guard isOn, let onSince else {
             if case .lowBattery(let threshold) = autoOffReason {
-                return "Off · battery below \(threshold)%"
+                return "Off · battery dropped to \(threshold)%"
             }
             return "Off"
         }
@@ -128,6 +133,8 @@ import Foundation
             return "Keeping Mac awake · \(formatElapsed(now().timeIntervalSince(onSince)))"
         }
         let secondsLeft = (endsAt.timeIntervalSince(now()) / 60).rounded(.up) * 60
+        // The next tick switches it off; until then don't claim "0m left".
+        guard secondsLeft > 0 else { return "Keeping Mac awake · ending" }
         return "Keeping Mac awake · \(formatElapsed(secondsLeft)) left · until \(clockFormatter.string(from: endsAt))"
     }
 
