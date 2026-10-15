@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <a href="https://your-username.github.io/cursormov/"><b>Website</b></a>
+  <a href="https://metayoub.github.io/CursorMov/"><b>Website</b></a>
 </p>
 
 <p align="center">
@@ -73,8 +73,8 @@ walk away, and your session is still there when you get back.
 ### Build
 
 ```bash
-git clone https://github.com/<your-username>/cursormov.git
-cd cursormov
+git clone https://github.com/metayoub/CursorMov.git
+cd CursorMov
 scripts/build-app.sh
 ```
 
