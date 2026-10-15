@@ -26,6 +26,22 @@ private func ourAssertionNames() -> [String] {
     #expect(UserDefaultsSettings(defaults: defaults).nudgeEnabled == false)
 }
 
+@Test func settingsDefaultBatteryThreshold20() {
+    #expect(UserDefaultsSettings(defaults: freshDefaults()).batteryThreshold == 20)
+}
+
+@Test func settingsPersistBatteryThreshold() {
+    let defaults = freshDefaults()
+    UserDefaultsSettings(defaults: defaults).batteryThreshold = 0
+    #expect(UserDefaultsSettings(defaults: defaults).batteryThreshold == 0)
+}
+
+@Test func systemBatteryReadsSanePercent() {
+    if let status = SystemBattery().status() {
+        #expect((0...100).contains(status.percent))
+    }
+}
+
 @Test func powerAssertionAppearsAndClears() {
     let assertion = PowerAssertion()
     #expect(assertion.acquire())

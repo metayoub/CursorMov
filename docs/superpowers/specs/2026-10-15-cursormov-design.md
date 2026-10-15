@@ -78,7 +78,8 @@ repo is pushed and Pages is enabled with source "GitHub Actions".
 
 ## Non-goals
 
-- Timers, schedules, "awake for N minutes", auto-off.
+- Schedules and "until a time of day" pickers. (Timed sessions and battery
+  auto-off were added on 2026-10-15 at the user's request; see below.)
 - Distribution (App Store, notarization). This is for the user's own Mac.
 - Settings window.
 
@@ -125,3 +126,18 @@ repo is pushed and Pages is enabled with source "GitHub Actions".
 - Icon drawing (SF Symbols or custom template images) matching the
   mockup's spirit.
 - Project layout, build setup, tests.
+
+## Additions (2026-10-15, user-approved)
+
+- **Accessibility warning:** when the nudge is enabled but not trusted, the
+  menu shows `⚠︎ Allow mouse nudge in Accessibility…`, opening that pane.
+- **Timed sessions:** `Keep awake for` submenu with 15 min, 30 min, 1 h, 2 h,
+  4 h. Left-click stays indefinite. Status reads
+  `Keeping Mac awake · 25m left · until 15:30`; switches off at the end.
+- **Battery safety:** `Turn off below battery` submenu: Never, 10%, 20%
+  (default), 30%. Turns off when, on battery, the level drops to the
+  threshold during a session (already-low at turn-on is respected). Status
+  then reads `Off · battery below 20%`. No notification.
+- Tooltip is a static `CursorMov — On/Off`; `Start when I log in` opens Login
+  Items settings when macOS requires approval.
+

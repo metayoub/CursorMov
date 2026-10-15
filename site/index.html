@@ -154,6 +154,8 @@
         <div class="card"><h3>No sleep, no lock</h3><p>While it's on, your Mac won't idle sleep, dim the screen, or lock itself.</p></div>
         <div class="card"><h3>Mouse nudge</h3><p>When you're away, it moves the pointer one pixel and back once a minute. Invisible, but macOS sees you as present.</p></div>
         <div class="card"><h3>Never in your way</h3><p>The nudge only runs while you're idle. No Dock icon, no window, no notifications.</p></div>
+        <div class="card"><h3>Timed sessions</h3><p>Keep awake for 15 minutes up to 4 hours, and it switches itself off when time is up.</p></div>
+        <div class="card"><h3>Battery safety</h3><p>On battery, it switches off at 20% (or 10%, 30%, never) so it can't drain your MacBook flat.</p></div>
       </div>
     </div>
   </section>
@@ -165,7 +167,7 @@
       <ol class="steps">
         <li>
           <h3>Download the DMG</h3>
-          <p>Get <strong>CursorMov-1.0.0.dmg</strong> from the latest GitHub release.</p>
+          <p>Get <strong>CursorMov-1.1.0.dmg</strong> from the latest GitHub release.</p>
           <p><a class="btn primary" href="https://github.com/metayoub/CursorMov/releases/latest">Download CursorMov</a></p>
         </li>
         <li>
@@ -209,15 +211,21 @@ open /Applications/CursorMov.app</code></pre>
           <dd>Turns keep-awake on or off.</dd>
           <dt>Right-click (or Control-click) the cup</dt>
           <dd>Opens the menu with the status and settings.</dd>
+          <dt>Keep awake for</dt>
+          <dd>A timed session: 15 or 30 minutes, 1, 2 or 4 hours. The status line shows time left and when it ends.</dd>
+          <dt>⚠︎ Allow mouse nudge in Accessibility…</dt>
+          <dd>Appears when the nudge needs permission. Click it to open the right Settings page.</dd>
           <dt>Nudge mouse</dt>
           <dd>Turns the mouse nudge on or off. Your choice is remembered.</dd>
+          <dt>Turn off below battery</dt>
+          <dd>On battery, switch off at 10%, 20% (default) or 30%, or never.</dd>
           <dt>Start when I log in</dt>
           <dd>Adds CursorMov to your login items.</dd>
           <dt>Quit</dt>
           <dd>Stops CursorMov and lets your Mac sleep normally again.</dd>
         </dl>
       </div>
-      <img src="images/menu.svg" width="320" height="196" alt="CursorMov menu: Keeping Mac awake 1h 12m, Nudge mouse checked, Start when I log in, Quit">
+      <img src="images/menu.svg" width="360" height="262" alt="CursorMov menu: status, Keep awake for, Nudge mouse checked, Turn off below battery, Start when I log in, Quit">
     </div>
   </section>
 

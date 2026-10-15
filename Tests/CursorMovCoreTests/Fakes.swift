@@ -27,6 +27,12 @@ final class FakeAccessibility: AccessibilityAuthority {
 
 final class FakeSettings: SettingsStore {
     var nudgeEnabled = true
+    var batteryThreshold = 20
+}
+
+final class FakeBattery: BatterySource {
+    var current: BatteryStatus? = BatteryStatus(isOnBattery: false, percent: 100)
+    func status() -> BatteryStatus? { current }
 }
 
 final class FakeClock {
@@ -40,12 +46,13 @@ struct Harness {
     let accessibility = FakeAccessibility()
     let settings = FakeSettings()
     let clock = FakeClock()
+    let battery = FakeBattery()
 
     @MainActor func makeController() -> KeepAwakeController {
         let clock = self.clock
         return KeepAwakeController(
             assertion: assertion, idle: idle, nudger: nudger,
-            accessibility: accessibility, settings: settings,
-            now: { clock.now })
+            accessibility: accessibility, settings: settings, battery: battery,
+            now: { clock.now }, timeZone: TimeZone(identifier: "UTC")!)
     }
 }

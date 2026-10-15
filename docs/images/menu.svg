@@ -1,13 +1,16 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="320" height="196" viewBox="0 0 320 196" role="img" aria-label="CursorMov right-click menu">
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="262" viewBox="0 0 360 262" role="img" aria-label="CursorMov right-click menu">
   <defs><filter id="s" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="6" stdDeviation="8" flood-opacity="0.25"/></filter></defs>
-  <rect x="16" y="10" width="288" height="170" rx="11" fill="#ececec" stroke="#000" stroke-opacity="0.12" filter="url(#s)"/>
+  <rect x="16" y="10" width="328" height="236" rx="11" fill="#ececec" stroke="#000" stroke-opacity="0.12" filter="url(#s)"/>
   <g font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif" font-size="14" fill="#1d1d1f">
-    <text x="40" y="40" fill="#8a8a8e">Keeping Mac awake · 1h 12m</text>
-    <path d="M30 56h260" stroke="#000" stroke-opacity="0.12"/>
-    <rect x="24" y="64" width="272" height="26" rx="5" fill="#2f6fde"/>
-    <text x="40" y="82" fill="#fff">✓</text><text x="58" y="82" fill="#fff">Nudge mouse</text>
-    <text x="58" y="110">Start when I log in</text>
-    <path d="M30 126h260" stroke="#000" stroke-opacity="0.12"/>
-    <text x="58" y="152">Quit</text><text x="282" y="152" text-anchor="end" fill="#8a8a8e">⌘Q</text>
+    <text x="40" y="40" fill="#8a8a8e">Keeping Mac awake · 25m left · until 15:30</text>
+    <path d="M30 56h300" stroke="#000" stroke-opacity="0.12"/>
+    <text x="58" y="82">Keep awake for</text><text x="322" y="82" text-anchor="end" fill="#8a8a8e">›</text>
+    <path d="M30 98h300" stroke="#000" stroke-opacity="0.12"/>
+    <rect x="24" y="106" width="312" height="26" rx="5" fill="#2f6fde"/>
+    <text x="40" y="124" fill="#fff">✓</text><text x="58" y="124" fill="#fff">Nudge mouse</text>
+    <text x="58" y="152">Turn off below battery</text><text x="322" y="152" text-anchor="end" fill="#8a8a8e">›</text>
+    <text x="58" y="180">Start when I log in</text>
+    <path d="M30 196h300" stroke="#000" stroke-opacity="0.12"/>
+    <text x="58" y="222">Quit</text><text x="322" y="222" text-anchor="end" fill="#8a8a8e">⌘Q</text>
   </g>
 </svg>

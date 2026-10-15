@@ -7,7 +7,8 @@ import CursorMovCore
         idle: SystemIdleTime(),
         nudger: CGMouseNudger(),
         accessibility: SystemAccessibility(),
-        settings: UserDefaultsSettings())
+        settings: UserDefaultsSettings(),
+        battery: SystemBattery())
     private var statusItemController: StatusItemController?
     private var timer: Timer?
 

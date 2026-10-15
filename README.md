@@ -51,6 +51,8 @@ touches your pointer while you're working.
   watch for activity register you as present.
 - **Never gets in your way.** The nudge only happens while you're idle, never while
   you're using the mouse or keyboard.
+- **Timed sessions.** Keep awake for 15 minutes up to 4 hours, then it switches itself off.
+- **Battery safety.** On battery, it switches off when the charge drops to 20% (or 10%, 30%, or never).
 - **Quiet.** No Dock icon, no window, no notifications. Just a cup.
 - **Safe defaults.** It always starts switched off, and quitting releases everything.
 
@@ -62,19 +64,31 @@ touches your pointer while you're working.
 | **Right-click** the cup (or Control-click) | Opens the menu |
 
 <p align="center">
-  <img src="docs/images/menu.svg" width="320" alt="Right-click menu: status, Nudge mouse, Start when I log in, Quit">
+  <img src="docs/images/menu.svg" width="360" alt="Right-click menu: status, Keep awake for, Nudge mouse, Turn off below battery, Start when I log in, Quit">
 </p>
 
-- **Keeping Mac awake · 1h 12m** shows how long it's been on.
-- **Nudge mouse** turns the mouse nudge on or off. Your choice is remembered.
+- **The status line** shows how long it's been on (`Keeping Mac awake · 1h 12m`), or for a
+  timed session how long is left and when it ends (`25m left · until 15:30`).
+- **⚠︎ Allow mouse nudge in Accessibility…** appears when the nudge is on but macOS hasn't
+  allowed it yet. Click it to open the right Settings page.
+- **Keep awake for** starts a timed session: 15 or 30 minutes, 1, 2 or 4 hours. It
+  switches itself off when the time is up. Left-click still means "on until I click again".
+- **Nudge mouse** turns the mouse nudge on or off.
+- **Turn off below battery** switches CursorMov off when your Mac is on battery and drops
+  to the chosen level: Never, 10%, 20% (default) or 30%. The menu then shows
+  `Off · battery below 20%`. If you turn it on when the battery is already low, it
+  respects your choice and stays on.
 - **Start when I log in** adds CursorMov to your login items.
-- **Quit** (⌘Q) stops CursorMov and lets your Mac sleep normally again.
+- **Quit** stops CursorMov and lets your Mac sleep normally again. While the menu is
+  open, ⌘Q does the same.
+
+Your choices for the nudge and the battery level are remembered.
 
 ## Install
 
 ### Download (easiest)
 
-1. Download **CursorMov-1.0.0.dmg** from the
+1. Download **CursorMov-1.1.0.dmg** from the
    [latest release](https://github.com/metayoub/CursorMov/releases/latest).
 2. Open the DMG and drag **CursorMov** onto **Applications**.
 3. Open CursorMov from Applications. The empty coffee cup appears in your menu bar.
@@ -130,7 +144,7 @@ it, and only the nudge is skipped.
   (`PreventUserIdleDisplaySleep`). That stops the display and the system from idle
   sleeping, which also stops the idle screen lock. You can see it with
   `pmset -g assertions`.
-- **Nudge.** Every 15 seconds it checks how long you've been idle. If it's been at least
+- **Nudge.** Every 15 seconds it checks how long you've been idle (and the timer and battery). If it's been at least
   60 seconds, it posts a real mouse-moved event one pixel over and another one back.
   That resets macOS's idle timer just like a hand on the mouse would. If the pointer
   is parked in a screen corner, the nudge is skipped so it can't trigger a Hot Corner

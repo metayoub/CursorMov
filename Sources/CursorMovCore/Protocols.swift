@@ -26,4 +26,21 @@ public protocol AccessibilityAuthority {
 /// Persisted user preferences.
 public protocol SettingsStore: AnyObject {
     var nudgeEnabled: Bool { get set }
+    /// Turn off when on battery at or below this percentage; 0 means never.
+    var batteryThreshold: Int { get set }
+}
+
+/// Battery state, or nil from `BatterySource` on Macs without a battery.
+public struct BatteryStatus: Equatable, Sendable {
+    public var isOnBattery: Bool
+    public var percent: Int
+
+    public init(isOnBattery: Bool, percent: Int) {
+        self.isOnBattery = isOnBattery
+        self.percent = percent
+    }
+}
+
+public protocol BatterySource {
+    func status() -> BatteryStatus?
 }
