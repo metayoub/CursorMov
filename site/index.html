@@ -127,7 +127,8 @@
     <h1>CursorMov</h1>
     <p class="lede">One click keeps your Mac awake, so your VPN and long-running jobs survive while you're away.</p>
     <div class="buttons">
-      <a class="btn primary" href="#get-started">Get started</a>
+      <a class="btn primary" href="https://github.com/metayoub/CursorMov/releases/latest">Download for Mac</a>
+      <a class="btn ghost" href="#get-started">How to install</a>
       <a class="btn ghost" href="https://github.com/metayoub/CursorMov">View on GitHub</a>
     </div>
     <div class="bars">
@@ -160,29 +161,22 @@
   <section id="get-started">
     <div class="wrap">
       <h2>Get started</h2>
-      <p class="intro">You build CursorMov from source. It takes about a minute.</p>
+      <p class="intro">Download it and you're running in under a minute. Requires macOS 26 or later, on Apple silicon or Intel.</p>
       <ol class="steps">
         <li>
-          <h3>Check the requirements</h3>
-          <p>macOS 26 or later, and Xcode 26 (or its command line tools with Swift 6.2). To check, run:</p>
-          <pre><code>swift --version</code></pre>
+          <h3>Download the DMG</h3>
+          <p>Get <strong>CursorMov-1.0.0.dmg</strong> from the latest GitHub release.</p>
+          <p><a class="btn primary" href="https://github.com/metayoub/CursorMov/releases/latest">Download CursorMov</a></p>
         </li>
         <li>
-          <h3>Get the code</h3>
-          <pre><code>git clone https://github.com/metayoub/CursorMov.git
-cd CursorMov</code></pre>
+          <h3>Drag it into Applications</h3>
+          <p>Open the DMG and drag the <strong>CursorMov</strong> cup onto the <strong>Applications</strong> folder next to it.</p>
         </li>
         <li>
-          <h3>Build the app</h3>
-          <pre><code>scripts/build-app.sh</code></pre>
-          <p>This creates <code>build/CursorMov.app</code>.</p>
-        </li>
-        <li>
-          <h3>Move it to Applications and open it</h3>
-          <pre><code>mv build/CursorMov.app /Applications/
-open /Applications/CursorMov.app</code></pre>
-          <p>An empty coffee cup appears in your menu bar.</p>
-          <div class="note"><strong>Blocked on first launch?</strong> The app is signed locally, not by a registered Apple developer. Open <strong>System Settings → Privacy &amp; Security</strong> and click <strong>Open Anyway</strong>.</div>
+          <h3>Open it the first time</h3>
+          <p>CursorMov is free and open source, so it isn't signed with a paid Apple Developer ID, and macOS blocks it the first time.</p>
+          <p>Open it once and close the warning. Then go to <strong>System Settings → Privacy &amp; Security</strong>, scroll down, click <strong>Open Anyway</strong> next to CursorMov, and confirm with <strong>Open</strong>. You only do this once.</p>
+          <div class="note">Prefer Terminal? <code>xattr -dr com.apple.quarantine /Applications/CursorMov.app</code></div>
         </li>
         <li>
           <h3>Allow the mouse nudge</h3>
@@ -191,9 +185,18 @@ open /Applications/CursorMov.app</code></pre>
         </li>
         <li>
           <h3>Click the cup</h3>
-          <p>The cup fills up and starts steaming. Your Mac stays awake until you click it again.</p>
+          <p>An empty coffee cup sits in your menu bar. Click it: it fills up and starts steaming, and your Mac stays awake until you click it again.</p>
         </li>
       </ol>
+
+      <h3 style="margin-top:40px">Or build it from source</h3>
+      <p class="intro">You'll need Xcode 26 (or its command line tools with Swift 6.2).</p>
+      <pre><code>git clone https://github.com/metayoub/CursorMov.git
+cd CursorMov
+scripts/build-app.sh
+mv build/CursorMov.app /Applications/
+open /Applications/CursorMov.app</code></pre>
+      <div class="note"><strong>Updating?</strong> Quit CursorMov and run <code>rm -rf /Applications/CursorMov.app</code> before moving the new copy in.</div>
     </div>
   </section>
 
@@ -232,7 +235,7 @@ open /Applications/CursorMov.app</code></pre>
 </main>
 
 <footer>
-  <div class="wrap">CursorMov · a tiny menu bar app for macOS · <a href="https://github.com/metayoub/CursorMov">Source on GitHub</a></div>
+  <div class="wrap">CursorMov · a tiny menu bar app for macOS · <a href="https://github.com/metayoub/CursorMov">Source on GitHub</a> · <a href="https://github.com/metayoub/CursorMov/blob/main/LICENSE">MIT License</a></div>
 </footer>
 
 </body>

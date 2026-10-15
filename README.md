@@ -16,6 +16,8 @@
   <img alt="macOS 26+" src="https://img.shields.io/badge/macOS-26%2B-000?logo=apple&logoColor=white">
   <img alt="Swift 6.2" src="https://img.shields.io/badge/Swift-6.2-F05138?logo=swift&logoColor=white">
   <img alt="No dependencies" src="https://img.shields.io/badge/dependencies-none-2ea44f">
+  <a href="LICENSE"><img alt="MIT License" src="https://img.shields.io/badge/license-MIT-blue"></a>
+  <a href="https://github.com/metayoub/CursorMov/releases/latest"><img alt="Download" src="https://img.shields.io/badge/download-DMG-b5652a"></a>
 </p>
 
 <p align="center">
@@ -65,12 +67,25 @@ walk away, and your session is still there when you get back.
 
 ## Install
 
-### Requirements
+### Download (easiest)
 
-- macOS 26 or later
-- Xcode 26 (or its command line tools with Swift 6.2)
+1. Download **CursorMov-1.0.0.dmg** from the
+   [latest release](https://github.com/metayoub/CursorMov/releases/latest).
+2. Open the DMG and drag **CursorMov** onto **Applications**.
+3. Open CursorMov from Applications. The empty coffee cup appears in your menu bar.
 
-### Build
+> **"CursorMov can't be opened" / "Apple could not verify…"**
+> CursorMov is free and open source, so it isn't signed with a paid Apple
+> Developer ID. macOS blocks it the first time. To open it anyway:
+> 1. Try to open CursorMov once, and close the warning.
+> 2. Go to **System Settings → Privacy & Security**, scroll down, and click **Open Anyway** next to CursorMov.
+> 3. Confirm with **Open**. You only need to do this once.
+>
+> Or, in Terminal: `xattr -dr com.apple.quarantine /Applications/CursorMov.app`
+
+### Build from source
+
+Requirements: macOS 26 or later, and Xcode 26 (or its command line tools with Swift 6.2).
 
 ```bash
 git clone https://github.com/metayoub/CursorMov.git
@@ -87,8 +102,8 @@ open /Applications/CursorMov.app
 
 The empty coffee cup appears in your menu bar.
 
-> **First launch:** the app is signed locally (ad-hoc), not by a registered Apple developer.
-> If macOS blocks it, open **System Settings → Privacy & Security** and click **Open Anyway**.
+> **Updating?** Quit CursorMov and delete the old copy first:
+> `rm -rf /Applications/CursorMov.app`
 
 ### Allow the mouse nudge
 
@@ -128,7 +143,9 @@ it, and only the nudge is skipped.
 ```bash
 swift test               # run the test suite
 swift build              # debug build
-scripts/build-app.sh     # build the .app bundle
+scripts/build-app.sh     # build the .app bundle (Apple silicon + Intel)
+scripts/build-dmg.sh     # build the release DMG into build/
+swift scripts/make-icon.swift   # regenerate AppIcon.icns from AppIcon.svg
 ```
 
 The project is a Swift package:
@@ -138,9 +155,10 @@ Sources/CursorMovCore/   core logic (testable) and macOS system adapters
 Sources/CursorMov/       the menu bar app (AppKit)
 Tests/CursorMovCoreTests/
 Resources/Info.plist     app bundle settings (no Dock icon)
-scripts/build-app.sh     builds CursorMov.app
+Resources/AppIcon.svg    app icon source (AppIcon.icns is generated from it)
+scripts/                 build-app.sh, build-dmg.sh, make-icon.swift
 ```
 
 ## License
 
-To be decided.
+[MIT](LICENSE) © 2026 Ayoub Metwalli
