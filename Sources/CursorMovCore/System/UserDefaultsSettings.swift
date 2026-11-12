@@ -8,6 +8,8 @@ public final class UserDefaultsSettings: SettingsStore {
     private static let scheduleStartKey = "scheduleStartMinute"
     private static let scheduleEndKey = "scheduleEndMinute"
     private static let scheduleDaysKey = "scheduleWeekdays"
+    private static let watchedAppsEnabledKey = "watchedAppsEnabled"
+    private static let watchedAppsKey = "watchedAppBundleIDs"
     private let defaults: UserDefaults
 
     public init(defaults: UserDefaults = .standard) {
@@ -45,6 +47,17 @@ public final class UserDefaultsSettings: SettingsStore {
             defaults.set(newValue.startMinute, forKey: Self.scheduleStartKey)
             defaults.set(newValue.endMinute, forKey: Self.scheduleEndKey)
             defaults.set(newValue.weekdays.sorted(), forKey: Self.scheduleDaysKey)
+        }
+    }
+
+    public var watchedApps: WatchedApps {
+        get {
+            WatchedApps(isEnabled: defaults.bool(forKey: Self.watchedAppsEnabledKey),
+                        bundleIDs: defaults.stringArray(forKey: Self.watchedAppsKey) ?? [])
+        }
+        set {
+            defaults.set(newValue.isEnabled, forKey: Self.watchedAppsEnabledKey)
+            defaults.set(newValue.bundleIDs, forKey: Self.watchedAppsKey)
         }
     }
 

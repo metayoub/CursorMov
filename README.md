@@ -58,6 +58,7 @@ touches your pointer while you're working.
   you're using the mouse or keyboard.
 - **Timed sessions.** Keep awake for 15 minutes up to 4 hours, then it switches itself off.
 - **Schedule.** Turns itself on and off at set times on the days you pick, say Mon–Fri 09:00–17:00.
+- **Only while an app is open.** Stays on while Cursor, VS Code, or any app you pick is open, and turns off when the last one quits.
 - **Battery safety.** On battery, it switches off when the charge drops to 20% (or 10%, 30%, or never).
 - **Quiet.** No Dock icon, no window, no notifications. Just a cup.
 - **Safe defaults.** It starts switched off (unless your schedule says otherwise), and quitting releases everything.
@@ -70,7 +71,7 @@ touches your pointer while you're working.
 | **Right-click** the cup (or Control-click) | Opens the menu |
 
 <p align="center">
-  <img src="docs/images/menu.svg" width="360" alt="Right-click menu: status, Keep awake for, Schedule, Nudge mouse, Turn off below battery, Start when I log in, Quit">
+  <img src="docs/images/menu.svg" width="360" alt="Right-click menu: status, Keep awake for, Schedule, Only while, Nudge mouse, Turn off below battery, Start when I log in, Quit">
 </p>
 
 - **The status line** shows how long it's been on (`Keeping Mac awake · 1h 12m`), or for a
@@ -85,6 +86,13 @@ touches your pointer while you're working.
   turn it off during the scheduled time, it stays off until the next scheduled day. A To time
   earlier than the From time runs overnight. Sessions you start yourself are never cut short
   by the schedule.
+- **Only while** opens a submenu with an on/off switch, the apps you've chosen (ticked, with
+  an *open* badge when running), the apps open right now (click one to add it), and
+  **Other app…** to pick one from Applications. While any chosen app is open, CursorMov
+  stays on (`Keeping Mac awake · Cursor is open`); when the last one quits, it turns off.
+  If you turn it off yourself while a chosen app is open, it stays off until you turn it on
+  again. It sees whether an app is *open*, not what it's doing: an idle Cursor window still
+  counts, and most VPN apps stay open when disconnected.
 - **Nudge mouse** turns the mouse nudge on or off.
 - **Turn off below battery** switches CursorMov off when your Mac is on battery and drops
   to the chosen level: Never, 10%, 20% (default) or 30%. The menu then shows
@@ -94,7 +102,7 @@ touches your pointer while you're working.
 - **Quit** stops CursorMov and lets your Mac sleep normally again. While the menu is
   open, ⌘Q does the same.
 
-Your choices for the nudge, the battery level and the schedule are remembered.
+Your choices for the nudge, the battery level, the schedule and the apps are remembered.
 
 ## Install
 

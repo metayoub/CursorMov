@@ -15,11 +15,13 @@ import CursorMovCore
 
     private let controller: KeepAwakeController
     private let loginItem: LoginItemControlling
+    private let watchedAppsMenu: WatchedAppsMenu
     private let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
 
     init(controller: KeepAwakeController, loginItem: LoginItemControlling) {
         self.controller = controller
         self.loginItem = loginItem
+        watchedAppsMenu = WatchedAppsMenu(controller: controller)
         super.init()
         if let button = statusItem.button {
             button.target = self
@@ -73,6 +75,7 @@ import CursorMovCore
         }
         schedule.addItem(scheduleControls)
         menu.addItem(submenu("Schedule · \(controller.schedule.summary)", schedule))
+        menu.addItem(submenu(watchedAppsMenu.title, watchedAppsMenu.makeMenu()))
         menu.addItem(.separator())
 
         menu.addItem(item("Nudge mouse", #selector(toggleNudge), checked: controller.nudgeEnabled))

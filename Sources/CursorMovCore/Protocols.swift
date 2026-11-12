@@ -29,6 +29,23 @@ public protocol SettingsStore: AnyObject {
     /// Turn off when on battery at or below this percentage; 0 means never.
     var batteryThreshold: Int { get set }
     var schedule: Schedule { get set }
+    var watchedApps: WatchedApps { get set }
+}
+
+/// An app that is running, as far as CursorMov cares.
+public struct RunningApp: Equatable, Sendable {
+    public var bundleID: String
+    public var name: String
+
+    public init(bundleID: String, name: String) {
+        self.bundleID = bundleID
+        self.name = name
+    }
+}
+
+/// The apps running right now.
+public protocol RunningAppsSource {
+    func runningApps() -> [RunningApp]
 }
 
 /// Battery state, or nil from `BatterySource` on Macs without a battery.
