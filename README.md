@@ -17,7 +17,6 @@
   <img alt="Swift 6.2" src="https://img.shields.io/badge/Swift-6.2-F05138?logo=swift&logoColor=white">
   <img alt="No dependencies" src="https://img.shields.io/badge/dependencies-none-2ea44f">
   <a href="LICENSE"><img alt="MIT License" src="https://img.shields.io/badge/license-MIT-blue"></a>
-  <a href="https://github.com/metayoub/CursorMov/releases/latest"><img alt="Download" src="https://img.shields.io/badge/download-DMG-b5652a"></a>
 </p>
 
 <p align="center">
@@ -114,21 +113,8 @@ Your choices for the nudge, the battery level, the schedule and the apps are rem
 
 ## Install
 
-### Download (easiest)
-
-1. Download **CursorMov-1.2.0.dmg** from the
-   [latest release](https://github.com/metayoub/CursorMov/releases/latest).
-2. Open the DMG and drag **CursorMov** onto **Applications**.
-3. Open CursorMov from Applications. The empty coffee cup appears in your menu bar.
-
-> **"CursorMov can't be opened" / "Apple could not verify…"**
-> CursorMov is free and open source, so it isn't signed with a paid Apple
-> Developer ID. macOS blocks it the first time. To open it anyway:
-> 1. Try to open CursorMov once, and close the warning.
-> 2. Go to **System Settings → Privacy & Security**, scroll down, and click **Open Anyway** next to CursorMov.
-> 3. Confirm with **Open**. You only need to do this once.
->
-> Or, in Terminal: `xattr -dr com.apple.quarantine /Applications/CursorMov.app`
+CursorMov isn't distributed as a download: you build it yourself from the source, which
+takes about a minute.
 
 ### Build from source
 
