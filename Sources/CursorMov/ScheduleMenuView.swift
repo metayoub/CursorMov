@@ -10,8 +10,8 @@ import CursorMovCore
     private var schedule: Schedule
     private let onChange: (Schedule) -> Void
     private let enabledSwitch = NSSwitch()
-    private let fromPicker = ScheduleMenuView.makeTimePicker()
-    private let toPicker = ScheduleMenuView.makeTimePicker()
+    private let fromPicker = TimeStepper()
+    private let toPicker = TimeStepper()
     private let days = NSSegmentedControl(labels: ScheduleMenuView.dayLabels, trackingMode: .selectAny,
                                           target: nil, action: nil)
 
@@ -22,16 +22,19 @@ import CursorMovCore
 
         enabledSwitch.controlSize = .small
         enabledSwitch.state = schedule.isEnabled ? .on : .off
-        fromPicker.dateValue = Self.date(minute: schedule.startMinute)
-        toPicker.dateValue = Self.date(minute: schedule.endMinute)
+        fromPicker.minuteOfDay = schedule.startMinute
+        toPicker.minuteOfDay = schedule.endMinute
         for (index, weekday) in Self.weekdays.enumerated() {
             days.setSelected(schedule.weekdays.contains(weekday), forSegment: index)
         }
         days.segmentDistribution = .fillEqually
         days.selectedSegmentBezelColor = .controlAccentColor
-        for control in [enabledSwitch, fromPicker, toPicker, days] as [NSControl] {
+        for control in [enabledSwitch, days] as [NSControl] {
             control.target = self
             control.action = #selector(controlChanged)
+        }
+        for picker in [fromPicker, toPicker] {
+            picker.onChange = { [weak self] in self?.controlChanged() }
         }
 
         let title = NSTextField(labelWithString: "Schedule")
@@ -54,7 +57,7 @@ import CursorMovCore
             stack.trailingAnchor.constraint(equalTo: trailingAnchor),
             stack.topAnchor.constraint(equalTo: topAnchor),
             stack.bottomAnchor.constraint(equalTo: bottomAnchor),
-            widthAnchor.constraint(equalToConstant: 290),
+            widthAnchor.constraint(equalToConstant: 340),
         ])
         frame.size = fittingSize
         updateEnabled()
@@ -64,8 +67,8 @@ import CursorMovCore
 
     @objc private func controlChanged() {
         schedule.isEnabled = enabledSwitch.state == .on
-        schedule.startMinute = Self.minute(of: fromPicker.dateValue)
-        schedule.endMinute = Self.minute(of: toPicker.dateValue)
+        schedule.startMinute = fromPicker.minuteOfDay
+        schedule.endMinute = toPicker.minuteOfDay
         schedule.weekdays = Set(Self.weekdays.indices.filter { days.isSelected(forSegment: $0) }
             .map { Self.weekdays[$0] })
         updateEnabled()
@@ -81,27 +84,80 @@ import CursorMovCore
     private static func label(_ text: String) -> NSTextField {
         let label = NSTextField(labelWithString: text)
         label.textColor = .secondaryLabelColor
+        label.setContentCompressionResistancePriority(.required, for: .horizontal)
         return label
     }
+}
 
-    private static func makeTimePicker() -> NSDatePicker {
-        let picker = NSDatePicker()
-        picker.datePickerStyle = .textFieldAndStepper
-        picker.datePickerElements = .hourMinute
-        picker.isBordered = false
-        picker.isBezeled = true
-        // 24-hour clock, like the status line.
-        picker.locale = Locale(identifier: "en_GB")
-        return picker
+/// A time of day as separate hour and minute boxes, each with its own arrows.
+/// (NSDatePicker's single stepper only changes the selected part, and inside a
+/// menu the minutes can't be selected.)
+@MainActor private final class TimeStepper: NSStackView {
+    static let minuteStep = 5
+
+    var onChange: (() -> Void)?
+    var minuteOfDay: Int {
+        get { hourStepper.integerValue * 60 + minuteStepper.integerValue }
+        set {
+            hourStepper.integerValue = newValue / 60
+            minuteStepper.integerValue = newValue % 60
+            updateFields()
+        }
     }
 
-    private static func date(minute: Int) -> Date {
-        Calendar.current.date(bySettingHour: minute / 60, minute: minute % 60, second: 0, of: Date())
-            ?? Date()
+    private let hourField = TimeStepper.makeField()
+    private let minuteField = TimeStepper.makeField()
+    private let hourStepper = TimeStepper.makeStepper(max: 23, step: 1)
+    private let minuteStepper = TimeStepper.makeStepper(max: 59, step: Double(TimeStepper.minuteStep))
+
+    init() {
+        super.init(frame: .zero)
+        spacing = 2
+        setViews([hourField, hourStepper, minuteField, minuteStepper], in: .leading)
+        setCustomSpacing(8, after: hourStepper)
+        for stepper in [hourStepper, minuteStepper] {
+            stepper.target = self
+            stepper.action = #selector(stepped(_:))
+        }
     }
 
-    private static func minute(of date: Date) -> Int {
-        let parts = Calendar.current.dateComponents([.hour, .minute], from: date)
-        return (parts.hour ?? 0) * 60 + (parts.minute ?? 0)
+    required init?(coder: NSCoder) { fatalError("not used") }
+
+    @objc private func stepped(_ sender: NSStepper) {
+        // Keep minutes on the step grid; wrap 55 → 00 and 00 → 55.
+        if sender === minuteStepper {
+            let step = Self.minuteStep
+            let value = sender.integerValue
+            let snapped = value == 59 ? 60 - step : value / step * step
+            sender.integerValue = snapped
+        }
+        updateFields()
+        onChange?()
+    }
+
+    private func updateFields() {
+        hourField.stringValue = String(format: "%02d", hourStepper.integerValue)
+        minuteField.stringValue = String(format: "%02d", minuteStepper.integerValue)
+    }
+
+    private static func makeField() -> NSTextField {
+        let field = NSTextField(string: "00")
+        field.isEditable = false
+        field.isSelectable = false
+        field.isBezeled = true
+        field.bezelStyle = .roundedBezel
+        field.alignment = .center
+        field.font = .monospacedDigitSystemFont(ofSize: NSFont.systemFontSize, weight: .regular)
+        field.widthAnchor.constraint(equalToConstant: 32).isActive = true
+        return field
+    }
+
+    private static func makeStepper(max: Double, step: Double) -> NSStepper {
+        let stepper = NSStepper()
+        stepper.minValue = 0
+        stepper.maxValue = max
+        stepper.increment = step
+        stepper.valueWraps = true
+        return stepper
     }
 }
