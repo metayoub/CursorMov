@@ -28,6 +28,7 @@ final class FakeAccessibility: AccessibilityAuthority {
 final class FakeSettings: SettingsStore {
     var nudgeEnabled = true
     var batteryThreshold = 20
+    var schedule = Schedule.standard
 }
 
 final class FakeBattery: BatterySource {

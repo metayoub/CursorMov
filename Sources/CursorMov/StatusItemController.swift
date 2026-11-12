@@ -66,6 +66,13 @@ import CursorMovCore
             keepAwakeFor.addItem(entry)
         }
         menu.addItem(submenu("Keep awake for", keepAwakeFor))
+        let schedule = NSMenu()
+        let scheduleControls = NSMenuItem()
+        scheduleControls.view = ScheduleMenuView(schedule: controller.schedule) { [controller] in
+            controller.schedule = $0
+        }
+        schedule.addItem(scheduleControls)
+        menu.addItem(submenu("Schedule · \(controller.schedule.summary)", schedule))
         menu.addItem(.separator())
 
         menu.addItem(item("Nudge mouse", #selector(toggleNudge), checked: controller.nudgeEnabled))
