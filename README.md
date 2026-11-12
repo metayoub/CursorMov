@@ -56,7 +56,7 @@ touches your pointer while you're working.
   watch for activity register you as present.
 - **Never gets in your way.** The nudge only happens while you're idle, never while
   you're using the mouse or keyboard.
-- **Timed sessions.** Keep awake for 15 minutes up to 4 hours, then it switches itself off.
+- **Timed sessions.** Keep awake for 15 minutes up to 4 hours, or until a time you pick (say 13:10), then it switches itself off.
 - **Schedule.** Turns itself on and off at set times on the days you pick, say Mon–Fri 09:00–17:00.
 - **Only while an app is open.** Stays on while Cursor, VS Code, or any app you pick is open, and turns off when the last one quits.
 - **Battery safety.** On battery, it switches off when the charge drops to 20% (or 10%, 30%, or never).
@@ -71,7 +71,7 @@ touches your pointer while you're working.
 | **Right-click** the cup (or Control-click) | Opens the menu |
 
 <p align="center">
-  <img src="docs/images/menu.svg" width="360" alt="Right-click menu: status, Keep awake for, Schedule, Only while, Nudge mouse, Turn off below battery, Start when I log in, Quit">
+  <img src="docs/images/menu.svg" width="360" alt="Right-click menu: status, Keep awake for, Turn off at, Schedule, Only while, Nudge mouse, Turn off below battery, Start when I log in, Quit">
 </p>
 
 - **The status line** shows how long it's been on (`Keeping Mac awake · 1h 12m`), or for a
@@ -80,6 +80,9 @@ touches your pointer while you're working.
   allowed it yet. Click it to open the right Settings page.
 - **Keep awake for** starts a timed session: 15 or 30 minutes, 1, 2 or 4 hours. It
   switches itself off when the time is up. Left-click still means "on until I click again".
+- **Turn off at** does the same, but you pick the time it stops with the hour and minute
+  arrows, then press **Start**. A time that has already passed today means tomorrow. It
+  remembers the last time you picked. Choosing one of these replaces the other.
 - **Schedule** opens a submenu with an on/off switch, **From** and **To** times, and the
   days it repeats on. When it's on, CursorMov turns on at the From time and off at the
   To time, and the status line shows the next start (`Off · starts Mon 09:00`). If you

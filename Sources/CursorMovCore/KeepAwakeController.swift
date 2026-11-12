@@ -148,6 +148,21 @@ import Foundation
         start(.timed, endsAt: now().addingTimeInterval(duration))
     }
 
+    /// Stays on until the next `minuteOfDay` (minutes after midnight): today if it's
+    /// still ahead, otherwise tomorrow. Replaces any running timer.
+    public func turnOn(untilMinuteOfDay minuteOfDay: Int) {
+        settings.turnOffAtMinute = minuteOfDay
+        appsPaused = false
+        start(.timed, endsAt: nextOccurrence(ofMinute: minuteOfDay))
+    }
+
+    /// The time "Turn off at" should offer: the last one picked, or the next full hour.
+    public var suggestedTurnOffMinute: Int {
+        if let last = settings.turnOffAtMinute { return last }
+        let hour = calendar.component(.hour, from: now())
+        return (hour + 1) % 24 * 60
+    }
+
     /// Switched off by the user: it stays off until they turn it on again
     /// (for watched apps) or until the next scheduled window.
     public func turnOff() {
@@ -275,6 +290,16 @@ import Foundation
         guard let window = schedule.window(containing: now(), calendar: calendar) else { return }
         stoppedWindow = window
         handledWindow = window
+    }
+
+    private func nextOccurrence(ofMinute minuteOfDay: Int) -> Date {
+        let today = calendar.startOfDay(for: now())
+        let candidate = calendar.date(bySettingHour: minuteOfDay / 60, minute: minuteOfDay % 60,
+                                      second: 0, of: today) ?? now()
+        guard candidate <= now() else { return candidate }
+        let tomorrow = calendar.date(byAdding: .day, value: 1, to: today) ?? today
+        return calendar.date(bySettingHour: minuteOfDay / 60, minute: minuteOfDay % 60,
+                             second: 0, of: tomorrow) ?? now()
     }
 
     private func overlaps(_ a: Schedule.Window, _ b: Schedule.Window?) -> Bool {

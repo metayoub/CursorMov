@@ -158,7 +158,7 @@
         <div class="card"><h3>No sleep, no lock</h3><p>While it's on, your Mac won't idle sleep, dim the screen, or lock itself.</p></div>
         <div class="card"><h3>Mouse nudge</h3><p>When you're away, it moves the pointer one pixel and back once a minute. Invisible, but macOS sees you as present.</p></div>
         <div class="card"><h3>Never in your way</h3><p>The nudge only runs while you're idle. No Dock icon, no window, no notifications.</p></div>
-        <div class="card"><h3>Timed sessions</h3><p>Keep awake for 15 minutes up to 4 hours, and it switches itself off when time is up.</p></div>
+        <div class="card"><h3>Timed sessions</h3><p>Keep awake for 15 minutes up to 4 hours, or until a time you pick, and it switches itself off when time is up.</p></div>
         <div class="card"><h3>Schedule</h3><p>Turns itself on and off at set times on the days you pick, say Mon–Fri 09:00–17:00.</p></div>
         <div class="card"><h3>Only while an app is open</h3><p>Stays on while Cursor, VS Code, or any app you pick is open, and turns off when the last one quits.</p></div>
         <div class="card"><h3>Battery safety</h3><p>On battery, it switches off at 20% (or 10%, 30%, never) so it can't drain your MacBook flat.</p></div>
@@ -219,6 +219,8 @@ open /Applications/CursorMov.app</code></pre>
           <dd>Opens the menu with the status and settings.</dd>
           <dt>Keep awake for</dt>
           <dd>A timed session: 15 or 30 minutes, 1, 2 or 4 hours. The status line shows time left and when it ends.</dd>
+          <dt>Turn off at</dt>
+          <dd>Pick the time it stops (say 13:10) and press Start. A time already past today means tomorrow.</dd>
           <dt>Schedule</dt>
           <dd>An on/off switch, From and To times, and the days to repeat on. Turn it off during the scheduled time and it stays off until the next scheduled day.</dd>
           <dt>Only while</dt>
@@ -235,7 +237,7 @@ open /Applications/CursorMov.app</code></pre>
           <dd>Stops CursorMov and lets your Mac sleep normally again.</dd>
         </dl>
       </div>
-      <img src="images/menu.svg" width="360" height="318" alt="CursorMov menu: status, Keep awake for, Schedule, Only while, Nudge mouse checked, Turn off below battery, Start when I log in, Quit">
+      <img src="images/menu.svg" width="360" height="346" alt="CursorMov menu: status, Keep awake for, Turn off at, Schedule, Only while, Nudge mouse checked, Turn off below battery, Start when I log in, Quit">
     </div>
   </section>
 

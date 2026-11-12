@@ -68,6 +68,13 @@ import CursorMovCore
             keepAwakeFor.addItem(entry)
         }
         menu.addItem(submenu("Keep awake for", keepAwakeFor))
+        let turnOffAt = NSMenu()
+        let turnOffAtControls = NSMenuItem()
+        turnOffAtControls.view = TurnOffAtMenuView(minuteOfDay: controller.suggestedTurnOffMinute) {
+            [controller] in controller.turnOn(untilMinuteOfDay: $0)
+        }
+        turnOffAt.addItem(turnOffAtControls)
+        menu.addItem(submenu("Turn off at", turnOffAt))
         let schedule = NSMenu()
         let scheduleControls = NSMenuItem()
         scheduleControls.view = ScheduleMenuView(schedule: controller.schedule) { [controller] in

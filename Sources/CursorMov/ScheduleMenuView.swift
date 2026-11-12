@@ -92,7 +92,7 @@ import CursorMovCore
 /// A time of day as separate hour and minute boxes, each with its own arrows.
 /// (NSDatePicker's single stepper only changes the selected part, and inside a
 /// menu the minutes can't be selected.)
-@MainActor private final class TimeStepper: NSStackView {
+@MainActor final class TimeStepper: NSStackView {
     static let minuteStep = 5
 
     var onChange: (() -> Void)?
