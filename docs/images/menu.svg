@@ -1,18 +1,19 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="360" height="318" viewBox="0 0 360 318" role="img" aria-label="CursorMov right-click menu">
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="346" viewBox="0 0 360 346" role="img" aria-label="CursorMov right-click menu">
   <defs><filter id="s" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="6" stdDeviation="8" flood-opacity="0.25"/></filter></defs>
-  <rect x="16" y="10" width="328" height="292" rx="11" fill="#ececec" stroke="#000" stroke-opacity="0.12" filter="url(#s)"/>
+  <rect x="16" y="10" width="328" height="320" rx="11" fill="#ececec" stroke="#000" stroke-opacity="0.12" filter="url(#s)"/>
   <g font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif" font-size="14" fill="#1d1d1f">
     <text x="40" y="40" fill="#8a8a8e">Keeping Mac awake · 25m left · until 15:30</text>
     <path d="M30 56h300" stroke="#000" stroke-opacity="0.12"/>
     <text x="58" y="82">Keep awake for</text><text x="322" y="82" text-anchor="end" fill="#8a8a8e">›</text>
-    <text x="58" y="110">Schedule · Mon–Fri 09:00–17:00</text><text x="322" y="110" text-anchor="end" fill="#8a8a8e">›</text>
-    <text x="58" y="138">Only while · Cursor, Code</text><text x="322" y="138" text-anchor="end" fill="#8a8a8e">›</text>
-    <path d="M30 154h300" stroke="#000" stroke-opacity="0.12"/>
-    <rect x="24" y="162" width="312" height="26" rx="5" fill="#2f6fde"/>
-    <text x="40" y="180" fill="#fff">✓</text><text x="58" y="180" fill="#fff">Nudge mouse</text>
-    <text x="58" y="208">Turn off below battery</text><text x="322" y="208" text-anchor="end" fill="#8a8a8e">›</text>
-    <text x="58" y="236">Start when I log in</text>
-    <path d="M30 252h300" stroke="#000" stroke-opacity="0.12"/>
-    <text x="58" y="278">Quit</text><text x="322" y="278" text-anchor="end" fill="#8a8a8e">⌘Q</text>
+    <text x="58" y="110">Turn off at</text><text x="322" y="110" text-anchor="end" fill="#8a8a8e">›</text>
+    <text x="58" y="138">Schedule · Mon–Fri 09:00–17:00</text><text x="322" y="138" text-anchor="end" fill="#8a8a8e">›</text>
+    <text x="58" y="166">Only while · Cursor, Code</text><text x="322" y="166" text-anchor="end" fill="#8a8a8e">›</text>
+    <path d="M30 182h300" stroke="#000" stroke-opacity="0.12"/>
+    <rect x="24" y="190" width="312" height="26" rx="5" fill="#2f6fde"/>
+    <text x="40" y="208" fill="#fff">✓</text><text x="58" y="208" fill="#fff">Nudge mouse</text>
+    <text x="58" y="236">Turn off below battery</text><text x="322" y="236" text-anchor="end" fill="#8a8a8e">›</text>
+    <text x="58" y="264">Start when I log in</text>
+    <path d="M30 280h300" stroke="#000" stroke-opacity="0.12"/>
+    <text x="58" y="306">Quit</text><text x="322" y="306" text-anchor="end" fill="#8a8a8e">⌘Q</text>
   </g>
 </svg>

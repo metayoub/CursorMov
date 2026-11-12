@@ -10,6 +10,7 @@ public final class UserDefaultsSettings: SettingsStore {
     private static let scheduleDaysKey = "scheduleWeekdays"
     private static let watchedAppsEnabledKey = "watchedAppsEnabled"
     private static let watchedAppsKey = "watchedAppBundleIDs"
+    private static let turnOffAtKey = "turnOffAtMinute"
     private let defaults: UserDefaults
 
     public init(defaults: UserDefaults = .standard) {
@@ -59,6 +60,11 @@ public final class UserDefaultsSettings: SettingsStore {
             defaults.set(newValue.isEnabled, forKey: Self.watchedAppsEnabledKey)
             defaults.set(newValue.bundleIDs, forKey: Self.watchedAppsKey)
         }
+    }
+
+    public var turnOffAtMinute: Int? {
+        get { (defaults.object(forKey: Self.turnOffAtKey) as? Int).map(Self.clampMinute) }
+        set { defaults.set(newValue, forKey: Self.turnOffAtKey) }
     }
 
     private static func clampMinute(_ minute: Int) -> Int {

@@ -140,18 +140,6 @@ private func watching(_ apps: RunningApp...) -> WatchedApps {
     #expect(c.isOn)
 }
 
-@MainActor @Test func timedSessionContinuesWhileAppOpen() {
-    let h = Harness()
-    let c = watched(h)
-    c.turnOn(for: 600)
-    h.runningApps.apps = [cursor]
-    h.clock.now += 600
-    c.tick()
-    #expect(c.isOn)
-    #expect(c.endsAt == nil)
-    #expect(c.statusText() == "Keeping Mac awake · Cursor is open")
-}
-
 @MainActor @Test func lowBatteryStopsAndWaitsForPower() {
     let h = Harness()
     h.battery.current = BatteryStatus(isOnBattery: true, percent: 50)
@@ -167,7 +155,7 @@ private func watching(_ apps: RunningApp...) -> WatchedApps {
     #expect(c.isOn)
 }
 
-// MARK: - With the schedule
+// MARK: - One mode at a time
 
 /// Monday 1970-01-12 at `hour`:00 UTC.
 private func monday(_ hour: Int) -> Date {
@@ -177,43 +165,103 @@ private func monday(_ hour: Int) -> Date {
 private let workdays = Schedule(isEnabled: true, startMinute: 9 * 60, endMinute: 17 * 60,
                                 weekdays: [2, 3, 4, 5, 6])
 
-@MainActor @Test func appKeepsItOnPastScheduleEnd() {
+@MainActor @Test func activeModeFollowsTheLastChoice() {
+    let h = Harness()
+    let c = h.makeController()
+    #expect(c.activeMode == nil)
+    c.schedule = workdays
+    #expect(c.activeMode == .schedule)
+    c.watchedApps = watching(cursor)
+    #expect(c.activeMode == .onlyWhile)
+    #expect(c.schedule.isEnabled == false)
+    c.turnOn(for: 600)
+    #expect(c.activeMode == .keepAwakeFor)
+    #expect(c.watchedApps.isEnabled == false)
+    c.turnOn(untilMinuteOfDay: 15 * 60)
+    #expect(c.activeMode == .turnOffAt)
+}
+
+@MainActor @Test func timerSwitchesRulesOffForGood() {
     let h = Harness()
     h.clock.now = monday(10)
+    h.runningApps.apps = [cursor]
     let c = watched(h)
+    c.turnOn(for: 600)
+    #expect(c.schedule.isEnabled == false)
+    #expect(c.watchedApps.isEnabled == false)
+    h.clock.now += 600
+    c.tick()
+    #expect(c.isOn == false)
+    // Cursor is still open, but "Only while" is off now.
+    c.tick()
+    #expect(c.isOn == false)
+    #expect(c.activeMode == nil)
+}
+
+@MainActor @Test func switchingScheduleOnCancelsTimerAndTakesOver() {
+    let h = Harness()
+    h.clock.now = monday(10)
+    let c = h.makeController()
+    c.turnOn(for: 600)
     c.schedule = workdays
+    #expect(c.isOn)
+    #expect(c.endsAt == monday(17))
+    #expect(c.activeMode == .schedule)
+}
+
+@MainActor @Test func switchingScheduleOnOutsideWindowCancelsTimer() {
+    let h = Harness()
+    h.clock.now = monday(20)
+    let c = h.makeController()
+    c.turnOn(for: 600)
+    c.schedule = workdays
+    #expect(c.isOn == false)
+}
+
+@MainActor @Test func switchingScheduleOnEndsAppSession() {
+    let h = Harness()
+    h.clock.now = monday(20)
+    h.runningApps.apps = [cursor]
+    let c = watched(h)
+    #expect(c.isOn)
+    c.schedule = workdays
+    #expect(c.watchedApps.isEnabled == false)
+    #expect(c.isOn == false)
+}
+
+@MainActor @Test func switchingAppsOnEndsScheduledSession() {
+    let h = Harness()
+    h.clock.now = monday(10)
+    let c = h.makeController()
+    c.schedule = workdays
+    #expect(c.isOn)
+    c.watchedApps = watching(cursor)
+    #expect(c.schedule.isEnabled == false)
+    #expect(c.isOn == false)
     h.runningApps.apps = [cursor]
     c.refresh()
-    h.clock.now = monday(17)
-    c.tick()
     #expect(c.isOn)
     #expect(c.statusText() == "Keeping Mac awake · Cursor is open")
 }
 
-@MainActor @Test func scheduleTakesOverWhenAppQuitsInWindow() {
+@MainActor @Test func scheduleCanRestartAfterTimerInterruptedIt() {
     let h = Harness()
-    h.clock.now = monday(8)
-    h.runningApps.apps = [cursor]
-    let c = watched(h)
+    h.clock.now = monday(10)
+    let c = h.makeController()
     c.schedule = workdays
-    h.clock.now = monday(9)
-    c.tick()
-    h.clock.now = monday(12)
-    h.runningApps.apps = []
-    c.refresh()
+    c.turnOn(for: 600)
+    var schedule = c.schedule
+    schedule.isEnabled = true
+    c.schedule = schedule
     #expect(c.isOn)
     #expect(c.endsAt == monday(17))
 }
 
-@MainActor @Test func manualOffInWindowStopsBothRules() {
+@MainActor @Test func editingEnabledScheduleKeepsAppsOff() {
     let h = Harness()
-    h.clock.now = monday(10)
-    h.runningApps.apps = [cursor]
-    let c = watched(h)
+    let c = h.makeController()
     c.schedule = workdays
-    c.toggle()
-    h.clock.now = monday(11)
-    h.runningApps.apps = []
-    c.tick()
-    #expect(c.isOn == false)
+    c.schedule.endMinute = 18 * 60
+    #expect(c.activeMode == .schedule)
+    #expect(c.watchedApps.isEnabled == false)
 }

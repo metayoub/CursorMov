@@ -10,11 +10,16 @@ import Foundation
         case lowBattery(threshold: Int)
     }
 
+    /// The ways CursorMov can switch itself off and on. Only one is active at a time.
+    public enum Mode: Equatable, Sendable {
+        case keepAwakeFor, turnOffAt, schedule, onlyWhile
+    }
+
     /// Why the current session is on.
     private enum SessionKind {
         /// Left-click: until switched off.
         case manual
-        /// "Keep awake for": until `endsAt`.
+        /// "Keep awake for" or "Turn off at": until `endsAt`.
         case timed
         /// The schedule: until the window's end, `endsAt`.
         case scheduled
@@ -47,17 +52,33 @@ import Foundation
         }
     }
 
+    /// The mode in charge, shown with a check mark in the menu; nil when none is.
+    public var activeMode: Mode? {
+        if kind == .timed { return timedByClock ? .turnOffAt : .keepAwakeFor }
+        if schedule.isEnabled { return .schedule }
+        if watchedApps.isEnabled { return .onlyWhile }
+        return nil
+    }
+
     /// Turns on by itself during the scheduled window. Changes apply right away.
+    /// Switching it on switches "Only while" off and cancels a timer.
     public var schedule: Schedule {
         get { settings.schedule }
         set {
+            let switchedOn = newValue.isEnabled && !settings.schedule.isEnabled
             settings.schedule = newValue
+            if switchedOn {
+                settings.watchedApps.isEnabled = false
+                if kind == .timed || kind == .apps { stop() }
+                // A fresh start: take over right away if inside the window.
+                handledWindow = nil
+            }
             if kind == .scheduled {
                 // Follow the new window, or end if now falls outside it.
                 if let window = newValue.window(containing: now(), calendar: calendar) {
                     endsAt = window.end
                 } else {
-                    endSession()
+                    stop()
                     // The schedule ended it, not the user: the new window may still start it.
                     handledWindow = nil
                 }
@@ -67,11 +88,18 @@ import Foundation
     }
 
     /// Stays on while any of these apps is open. Changes apply right away.
+    /// Switching it on switches the schedule off and cancels a timer.
     public var watchedApps: WatchedApps {
         get { settings.watchedApps }
         set {
+            let switchedOn = newValue.isEnabled && !settings.watchedApps.isEnabled
             settings.watchedApps = newValue
-            if kind == .apps && openWatchedApps().isEmpty { endSession() }
+            if switchedOn {
+                settings.schedule.isEnabled = false
+                if kind == .timed || kind == .scheduled { stop() }
+                appsPaused = false
+            }
+            if kind == .apps && openWatchedApps().isEmpty { stop() }
             refresh()
         }
     }
@@ -99,9 +127,8 @@ import Foundation
     /// The last window the schedule acted on. Each window is used once, so stopping
     /// during it keeps the Mac off until the next one, even if the times are edited.
     private var handledWindow: Schedule.Window?
-    /// A window the user (or low battery) switched off during; the schedule won't
-    /// take over a session in it.
-    private var stoppedWindow: Schedule.Window?
+    /// The running timer came from "Turn off at" rather than "Keep awake for".
+    private var timedByClock = false
     /// Switched off by hand while a watched app was open: apps can't turn it on
     /// again until the user does.
     private var appsPaused = false
@@ -143,9 +170,23 @@ import Foundation
     }
 
     /// Stays on for `duration` seconds, restarting the timer if already on.
+    /// Switches the schedule and "Only while" off.
     public func turnOn(for duration: TimeInterval) {
-        appsPaused = false
-        start(.timed, endsAt: now().addingTimeInterval(duration))
+        startTimer(until: now().addingTimeInterval(duration), byClock: false)
+    }
+
+    /// Stays on until the next `minuteOfDay` (minutes after midnight): today if it's
+    /// still ahead, otherwise tomorrow. Replaces any running timer.
+    public func turnOn(untilMinuteOfDay minuteOfDay: Int) {
+        settings.turnOffAtMinute = minuteOfDay
+        startTimer(until: nextOccurrence(ofMinute: minuteOfDay), byClock: true)
+    }
+
+    /// The time "Turn off at" should offer: the last one picked, or the next full hour.
+    public var suggestedTurnOffMinute: Int {
+        if let last = settings.turnOffAtMinute { return last }
+        let hour = calendar.component(.hour, from: now())
+        return (hour + 1) % 24 * 60
     }
 
     /// Switched off by the user: it stays off until they turn it on again
@@ -159,8 +200,8 @@ import Foundation
 
     /// Re-checks the schedule and watched apps, e.g. when an app launches or quits.
     public func refresh() {
-        if isOn, let endsAt, now() >= endsAt { endSession() }
-        if kind == .apps && openWatchedApps().isEmpty { endSession() }
+        if isOn, let endsAt, now() >= endsAt { stop() }
+        if kind == .apps && openWatchedApps().isEmpty { stop() }
         applySchedule()
         applyWatchedApps()
     }
@@ -226,19 +267,13 @@ import Foundation
         start(.apps, endsAt: nil)
     }
 
-    /// The reason that ended has gone; stay on if another one holds ("on wins").
-    private func endSession() {
-        if !appsPaused && !openWatchedApps().isEmpty {
-            kind = .apps
-            endsAt = nil
-        } else if let window = schedule.window(containing: now(), calendar: calendar),
-                  !overlaps(window, stoppedWindow) {
-            kind = .scheduled
-            endsAt = window.end
-            handledWindow = window
-        } else {
-            stop()
-        }
+    /// Timers replace the schedule and "Only while": only one mode is active at a time.
+    private func startTimer(until end: Date, byClock: Bool) {
+        settings.schedule.isEnabled = false
+        settings.watchedApps.isEnabled = false
+        appsPaused = false
+        guard start(.timed, endsAt: end) else { return }
+        timedByClock = byClock
     }
 
     /// Starts a session, or switches the running one to `kind`. False if macOS refused.
@@ -273,13 +308,17 @@ import Foundation
     /// Stopping during a window keeps the schedule off for the rest of it.
     private func markScheduleStopped() {
         guard let window = schedule.window(containing: now(), calendar: calendar) else { return }
-        stoppedWindow = window
         handledWindow = window
     }
 
-    private func overlaps(_ a: Schedule.Window, _ b: Schedule.Window?) -> Bool {
-        guard let b else { return false }
-        return a.start < b.end && b.start < a.end
+    private func nextOccurrence(ofMinute minuteOfDay: Int) -> Date {
+        let today = calendar.startOfDay(for: now())
+        let candidate = calendar.date(bySettingHour: minuteOfDay / 60, minute: minuteOfDay % 60,
+                                      second: 0, of: today) ?? now()
+        guard candidate <= now() else { return candidate }
+        let tomorrow = calendar.date(byAdding: .day, value: 1, to: today) ?? today
+        return calendar.date(bySettingHour: minuteOfDay / 60, minute: minuteOfDay % 60,
+                             second: 0, of: tomorrow) ?? now()
     }
 
     private func openWatchedApps() -> [RunningApp] {

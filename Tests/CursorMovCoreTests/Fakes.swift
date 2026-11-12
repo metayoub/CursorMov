@@ -30,6 +30,7 @@ final class FakeSettings: SettingsStore {
     var batteryThreshold = 20
     var schedule = Schedule.standard
     var watchedApps = WatchedApps.standard
+    var turnOffAtMinute: Int?
 }
 
 final class FakeRunningApps: RunningAppsSource {

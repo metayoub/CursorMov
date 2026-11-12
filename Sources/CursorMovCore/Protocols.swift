@@ -30,6 +30,8 @@ public protocol SettingsStore: AnyObject {
     var batteryThreshold: Int { get set }
     var schedule: Schedule { get set }
     var watchedApps: WatchedApps { get set }
+    /// The last time picked in "Turn off at", minutes after midnight; nil if never used.
+    var turnOffAtMinute: Int? { get set }
 }
 
 /// An app that is running, as far as CursorMov cares.
