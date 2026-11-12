@@ -57,9 +57,10 @@ touches your pointer while you're working.
 - **Never gets in your way.** The nudge only happens while you're idle, never while
   you're using the mouse or keyboard.
 - **Timed sessions.** Keep awake for 15 minutes up to 4 hours, then it switches itself off.
+- **Schedule.** Turns itself on and off at set times on the days you pick, say Mon–Fri 09:00–17:00.
 - **Battery safety.** On battery, it switches off when the charge drops to 20% (or 10%, 30%, or never).
 - **Quiet.** No Dock icon, no window, no notifications. Just a cup.
-- **Safe defaults.** It always starts switched off, and quitting releases everything.
+- **Safe defaults.** It starts switched off (unless your schedule says otherwise), and quitting releases everything.
 
 ## Using it
 
@@ -69,7 +70,7 @@ touches your pointer while you're working.
 | **Right-click** the cup (or Control-click) | Opens the menu |
 
 <p align="center">
-  <img src="docs/images/menu.svg" width="360" alt="Right-click menu: status, Keep awake for, Nudge mouse, Turn off below battery, Start when I log in, Quit">
+  <img src="docs/images/menu.svg" width="360" alt="Right-click menu: status, Keep awake for, Schedule, Nudge mouse, Turn off below battery, Start when I log in, Quit">
 </p>
 
 - **The status line** shows how long it's been on (`Keeping Mac awake · 1h 12m`), or for a
@@ -78,6 +79,12 @@ touches your pointer while you're working.
   allowed it yet. Click it to open the right Settings page.
 - **Keep awake for** starts a timed session: 15 or 30 minutes, 1, 2 or 4 hours. It
   switches itself off when the time is up. Left-click still means "on until I click again".
+- **Schedule** opens a submenu with an on/off switch, **From** and **To** times, and the
+  days it repeats on. When it's on, CursorMov turns on at the From time and off at the
+  To time, and the status line shows the next start (`Off · starts Mon 09:00`). If you
+  turn it off during the scheduled time, it stays off until the next scheduled day. A To time
+  earlier than the From time runs overnight. Sessions you start yourself are never cut short
+  by the schedule.
 - **Nudge mouse** turns the mouse nudge on or off.
 - **Turn off below battery** switches CursorMov off when your Mac is on battery and drops
   to the chosen level: Never, 10%, 20% (default) or 30%. The menu then shows
@@ -87,7 +94,7 @@ touches your pointer while you're working.
 - **Quit** stops CursorMov and lets your Mac sleep normally again. While the menu is
   open, ⌘Q does the same.
 
-Your choices for the nudge and the battery level are remembered.
+Your choices for the nudge, the battery level and the schedule are remembered.
 
 ## Install
 

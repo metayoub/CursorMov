@@ -28,6 +28,7 @@ public protocol SettingsStore: AnyObject {
     var nudgeEnabled: Bool { get set }
     /// Turn off when on battery at or below this percentage; 0 means never.
     var batteryThreshold: Int { get set }
+    var schedule: Schedule { get set }
 }
 
 /// Battery state, or nil from `BatterySource` on Macs without a battery.
