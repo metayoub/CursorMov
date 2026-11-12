@@ -185,7 +185,7 @@ private func workdays(_ start: Int = 9 * 60, _ end: Int = 17 * 60) -> Schedule {
     c.tick()
     c.turnOn(for: 3600)
     #expect(c.endsAt == monday(10))
-    c.schedule.isEnabled = false
+    #expect(c.schedule.isEnabled == false)
     #expect(c.isOn)
 }
 

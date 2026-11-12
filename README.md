@@ -78,17 +78,22 @@ touches your pointer while you're working.
   timed session how long is left and when it ends (`25m left · until 15:30`).
 - **⚠︎ Allow mouse nudge in Accessibility…** appears when the nudge is on but macOS hasn't
   allowed it yet. Click it to open the right Settings page.
+
+**Keep awake for**, **Turn off at**, **Schedule** and **Only while** are four ways to let
+CursorMov switch itself on and off, and only one is in charge at a time: choosing one switches
+the others off (your times, days and apps are kept for next time). The one in charge has a ✓.
+
 - **Keep awake for** starts a timed session: 15 or 30 minutes, 1, 2 or 4 hours. It
   switches itself off when the time is up. Left-click still means "on until I click again".
 - **Turn off at** does the same, but you pick the time it stops with the hour and minute
   arrows, then press **Start**. A time that has already passed today means tomorrow. It
-  remembers the last time you picked. Choosing one of these replaces the other.
+  remembers the last time you picked.
 - **Schedule** opens a submenu with an on/off switch, **From** and **To** times, and the
   days it repeats on. When it's on, CursorMov turns on at the From time and off at the
   To time, and the status line shows the next start (`Off · starts Mon 09:00`). If you
   turn it off during the scheduled time, it stays off until the next scheduled day. A To time
-  earlier than the From time runs overnight. Sessions you start yourself are never cut short
-  by the schedule.
+  earlier than the From time runs overnight. A session you start with a left-click is never
+  cut short by the schedule.
 - **Only while** opens a submenu with an on/off switch, the apps you've chosen (ticked, with
   an *open* badge when running), the apps open right now (click one to add it), and
   **Other app…** to pick one from Applications. While any chosen app is open, CursorMov

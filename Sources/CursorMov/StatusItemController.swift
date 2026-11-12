@@ -61,28 +61,29 @@ import CursorMovCore
         }
         menu.addItem(.separator())
 
+        let mode = controller.activeMode
         let keepAwakeFor = NSMenu()
         for (index, duration) in Self.durations.enumerated() {
             let entry = item(duration.title, #selector(keepAwakeForDuration(_:)))
             entry.tag = index
             keepAwakeFor.addItem(entry)
         }
-        menu.addItem(submenu("Keep awake for", keepAwakeFor))
+        menu.addItem(submenu("Keep awake for", keepAwakeFor, active: mode == .keepAwakeFor))
         let turnOffAt = NSMenu()
         let turnOffAtControls = NSMenuItem()
         turnOffAtControls.view = TurnOffAtMenuView(minuteOfDay: controller.suggestedTurnOffMinute) {
             [controller] in controller.turnOn(untilMinuteOfDay: $0)
         }
         turnOffAt.addItem(turnOffAtControls)
-        menu.addItem(submenu("Turn off at", turnOffAt))
+        menu.addItem(submenu("Turn off at", turnOffAt, active: mode == .turnOffAt))
         let schedule = NSMenu()
         let scheduleControls = NSMenuItem()
         scheduleControls.view = ScheduleMenuView(schedule: controller.schedule) { [controller] in
             controller.schedule = $0
         }
         schedule.addItem(scheduleControls)
-        menu.addItem(submenu("Schedule · \(controller.schedule.summary)", schedule))
-        menu.addItem(submenu(watchedAppsMenu.title, watchedAppsMenu.makeMenu()))
+        menu.addItem(submenu("Schedule · \(controller.schedule.summary)", schedule, active: mode == .schedule))
+        menu.addItem(submenu(watchedAppsMenu.title, watchedAppsMenu.makeMenu(), active: mode == .onlyWhile))
         menu.addItem(.separator())
 
         menu.addItem(item("Nudge mouse", #selector(toggleNudge), checked: controller.nudgeEnabled))
@@ -111,9 +112,11 @@ import CursorMovCore
         return item
     }
 
-    private func submenu(_ title: String, _ submenu: NSMenu) -> NSMenuItem {
+    private func submenu(_ title: String, _ submenu: NSMenu, active: Bool = false) -> NSMenuItem {
         let item = NSMenuItem(title: title, action: nil, keyEquivalent: "")
         item.submenu = submenu
+        // Only one of the modes is in charge at a time; tick it.
+        item.state = active ? .on : .off
         return item
     }
 
