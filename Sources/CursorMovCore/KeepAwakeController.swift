@@ -10,9 +10,21 @@ import Foundation
         case lowBattery(threshold: Int)
     }
 
+    /// Why the current session is on.
+    private enum SessionKind {
+        /// Left-click: until switched off.
+        case manual
+        /// "Keep awake for": until `endsAt`.
+        case timed
+        /// The schedule: until the window's end, `endsAt`.
+        case scheduled
+        /// A watched app is open: until the last one quits.
+        case apps
+    }
+
     public private(set) var isOn = false
     public private(set) var onSince: Date?
-    /// When a timed session ends; nil when it stays on until switched off.
+    /// When a timed or scheduled session ends; nil otherwise.
     public private(set) var endsAt: Date?
     /// Fired after `isOn` changes.
     public var onStateChange: ((Bool) -> Void)?
@@ -40,17 +52,27 @@ import Foundation
         get { settings.schedule }
         set {
             settings.schedule = newValue
-            if isScheduledSession {
-                // Follow the new window, or stop if now falls outside it.
+            if kind == .scheduled {
+                // Follow the new window, or end if now falls outside it.
                 if let window = newValue.window(containing: now(), calendar: calendar) {
                     endsAt = window.end
                 } else {
-                    turnOff()
-                    // The schedule stopped it, not the user: the new window may still start it.
+                    endSession()
+                    // The schedule ended it, not the user: the new window may still start it.
                     handledWindow = nil
                 }
             }
-            applySchedule()
+            refresh()
+        }
+    }
+
+    /// Stays on while any of these apps is open. Changes apply right away.
+    public var watchedApps: WatchedApps {
+        get { settings.watchedApps }
+        set {
+            settings.watchedApps = newValue
+            if kind == .apps && openWatchedApps().isEmpty { endSession() }
+            refresh()
         }
     }
 
@@ -65,6 +87,7 @@ import Foundation
     private let accessibility: AccessibilityAuthority
     private let settings: SettingsStore
     private let battery: BatterySource
+    private let runningApps: RunningAppsSource
     private let now: () -> Date
     private let clockFormatter: DateFormatter
     private let dayFormatter: DateFormatter
@@ -72,15 +95,20 @@ import Foundation
     private var hasPromptedForAccess = false
     private var wasBatteryLow = false
     private var autoOffReason: AutoOffReason?
-    /// The current session was started by the schedule.
-    private var isScheduledSession = false
+    private var kind: SessionKind?
     /// The last window the schedule acted on. Each window is used once, so stopping
     /// during it keeps the Mac off until the next one, even if the times are edited.
     private var handledWindow: Schedule.Window?
+    /// A window the user (or low battery) switched off during; the schedule won't
+    /// take over a session in it.
+    private var stoppedWindow: Schedule.Window?
+    /// Switched off by hand while a watched app was open: apps can't turn it on
+    /// again until the user does.
+    private var appsPaused = false
 
     public init(assertion: KeepAwakeAssertion, idle: IdleTimeSource, nudger: MouseNudger,
                 accessibility: AccessibilityAuthority, settings: SettingsStore,
-                battery: BatterySource, now: @escaping () -> Date = Date.init,
+                battery: BatterySource, runningApps: RunningAppsSource, now: @escaping () -> Date = Date.init,
                 timeZone: TimeZone = .autoupdatingCurrent) {
         self.assertion = assertion
         self.idle = idle
@@ -88,6 +116,7 @@ import Foundation
         self.accessibility = accessibility
         self.settings = settings
         self.battery = battery
+        self.runningApps = runningApps
         self.now = now
         clockFormatter = DateFormatter()
         clockFormatter.locale = Locale(identifier: "en_US_POSIX")
@@ -106,49 +135,45 @@ import Foundation
         isOn ? turnOff() : turnOn()
     }
 
-    /// Stays on until switched off.
+    /// Stays on until switched off, or, if a watched app is open, until the last one quits.
     public func turnOn() {
-        isScheduledSession = false
-        guard !isOn, assertion.acquire() else { return }
-        isOn = true
-        onSince = now()
-        endsAt = nil
-        autoOffReason = nil
-        // Only a drop to the threshold during this session switches it off;
-        // if it's already low, the user chose to turn it on anyway.
-        wasBatteryLow = isBatteryLow()
-        requestAccessIfNeeded()
-        onStateChange?(true)
+        appsPaused = false
+        guard !isOn else { return }
+        start(openWatchedApps().isEmpty ? .manual : .apps, endsAt: nil)
     }
 
     /// Stays on for `duration` seconds, restarting the timer if already on.
     public func turnOn(for duration: TimeInterval) {
-        turnOn()
-        guard isOn else { return }
-        endsAt = now().addingTimeInterval(duration)
+        appsPaused = false
+        start(.timed, endsAt: now().addingTimeInterval(duration))
     }
 
+    /// Switched off by the user: it stays off until they turn it on again
+    /// (for watched apps) or until the next scheduled window.
     public func turnOff() {
         guard isOn else { return }
-        assertion.release()
-        isOn = false
-        onSince = nil
-        endsAt = nil
-        isScheduledSession = false
-        onStateChange?(false)
+        if !openWatchedApps().isEmpty { appsPaused = true }
+        markScheduleStopped()
+        stop()
+    }
+
+    /// Re-checks the schedule and watched apps, e.g. when an app launches or quits.
+    public func refresh() {
+        if isOn, let endsAt, now() >= endsAt { endSession() }
+        if kind == .apps && openWatchedApps().isEmpty { endSession() }
+        applySchedule()
+        applyWatchedApps()
     }
 
     /// Called every `tickInterval` seconds.
     public func tick() {
-        if let endsAt, isOn, now() >= endsAt {
-            turnOff()
-        }
-        applySchedule()
+        refresh()
         guard isOn else { return }
         let batteryLow = isBatteryLow()
         defer { wasBatteryLow = batteryLow }
         if batteryLow && !wasBatteryLow {
-            turnOff()
+            markScheduleStopped()
+            stop()
             autoOffReason = .lowBattery(threshold: batteryThreshold)
             return
         }
@@ -166,6 +191,9 @@ import Foundation
                 return "Off · starts \(dayName(start)) \(clockFormatter.string(from: start))"
             }
             return "Off"
+        }
+        if kind == .apps, let open = WatchedApps.openPhrase(openWatchedApps().map(\.name)) {
+            return "Keeping Mac awake · \(open)"
         }
         guard let endsAt else {
             return "Keeping Mac awake · \(formatElapsed(now().timeIntervalSince(onSince)))"
@@ -188,12 +216,74 @@ import Foundation
             return
         }
         // Wait for power rather than start on a low battery; try again next tick.
-        guard !isBatteryLow() else { return }
-        turnOn()
-        guard isOn else { return }
+        guard !isBatteryLow(), start(.scheduled, endsAt: window.end) else { return }
         handledWindow = window
-        endsAt = window.end
-        isScheduledSession = true
+    }
+
+    /// Turns on while a watched app is open, unless the user switched it off.
+    private func applyWatchedApps() {
+        guard !isOn, !appsPaused, !openWatchedApps().isEmpty, !isBatteryLow() else { return }
+        start(.apps, endsAt: nil)
+    }
+
+    /// The reason that ended has gone; stay on if another one holds ("on wins").
+    private func endSession() {
+        if !appsPaused && !openWatchedApps().isEmpty {
+            kind = .apps
+            endsAt = nil
+        } else if let window = schedule.window(containing: now(), calendar: calendar),
+                  !overlaps(window, stoppedWindow) {
+            kind = .scheduled
+            endsAt = window.end
+            handledWindow = window
+        } else {
+            stop()
+        }
+    }
+
+    /// Starts a session, or switches the running one to `kind`. False if macOS refused.
+    @discardableResult
+    private func start(_ kind: SessionKind, endsAt: Date?) -> Bool {
+        if !isOn {
+            guard assertion.acquire() else { return false }
+            isOn = true
+            onSince = now()
+            autoOffReason = nil
+            // Only a drop to the threshold during this session switches it off;
+            // if it's already low, the user chose to turn it on anyway.
+            wasBatteryLow = isBatteryLow()
+            requestAccessIfNeeded()
+            onStateChange?(true)
+        }
+        self.kind = kind
+        self.endsAt = endsAt
+        return true
+    }
+
+    private func stop() {
+        guard isOn else { return }
+        assertion.release()
+        isOn = false
+        onSince = nil
+        endsAt = nil
+        kind = nil
+        onStateChange?(false)
+    }
+
+    /// Stopping during a window keeps the schedule off for the rest of it.
+    private func markScheduleStopped() {
+        guard let window = schedule.window(containing: now(), calendar: calendar) else { return }
+        stoppedWindow = window
+        handledWindow = window
+    }
+
+    private func overlaps(_ a: Schedule.Window, _ b: Schedule.Window?) -> Bool {
+        guard let b else { return false }
+        return a.start < b.end && b.start < a.end
+    }
+
+    private func openWatchedApps() -> [RunningApp] {
+        watchedApps.running(in: runningApps.runningApps())
     }
 
     private func dayName(_ date: Date) -> String {

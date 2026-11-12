@@ -29,6 +29,12 @@ final class FakeSettings: SettingsStore {
     var nudgeEnabled = true
     var batteryThreshold = 20
     var schedule = Schedule.standard
+    var watchedApps = WatchedApps.standard
+}
+
+final class FakeRunningApps: RunningAppsSource {
+    var apps: [RunningApp] = []
+    func runningApps() -> [RunningApp] { apps }
 }
 
 final class FakeBattery: BatterySource {
@@ -48,12 +54,14 @@ struct Harness {
     let settings = FakeSettings()
     let clock = FakeClock()
     let battery = FakeBattery()
+    let runningApps = FakeRunningApps()
 
     @MainActor func makeController() -> KeepAwakeController {
         let clock = self.clock
         return KeepAwakeController(
             assertion: assertion, idle: idle, nudger: nudger,
             accessibility: accessibility, settings: settings, battery: battery,
+            runningApps: runningApps,
             now: { clock.now }, timeZone: TimeZone(identifier: "UTC")!)
     }
 }
