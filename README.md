@@ -116,7 +116,7 @@ Your choices for the nudge, the battery level, the schedule and the apps are rem
 
 ### Download (easiest)
 
-1. Download **CursorMov-1.1.0.dmg** from the
+1. Download **CursorMov-1.2.0.dmg** from the
    [latest release](https://github.com/metayoub/CursorMov/releases/latest).
 2. Open the DMG and drag **CursorMov** onto **Applications**.
 3. Open CursorMov from Applications. The empty coffee cup appears in your menu bar.
